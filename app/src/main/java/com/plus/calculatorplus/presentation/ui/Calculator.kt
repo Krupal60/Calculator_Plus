@@ -1,13 +1,14 @@
+@file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
+
 package com.plus.calculatorplus.presentation.ui
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -17,6 +18,8 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
@@ -29,16 +32,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.window.core.layout.WindowSizeClass
 import com.plus.calculatorplus.data.model.calculator.CalculatorAction
 import com.plus.calculatorplus.data.model.calculator.CalculatorOperation
 import com.plus.calculatorplus.data.model.calculator.CalculatorState
 import com.plus.calculatorplus.presentation.components.CalculatorButton
+import com.plus.calculatorplus.presentation.util.HeightSizeClasses
+import com.plus.calculatorplus.presentation.util.WidthSizeClasses
+import com.plus.calculatorplus.presentation.util.minHeight
+import com.plus.calculatorplus.presentation.util.minWidth
 import com.plus.calculatorplus.ui.theme.orange
 import com.plus.calculatorplus.viewmodel.CalculationViewModel
 
 
 @Composable
-fun CalculatorMain(paddingValues: PaddingValues,viewModel : CalculationViewModel = viewModel()) {
+fun CalculatorMain(paddingValues: PaddingValues, viewModel: CalculationViewModel = viewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle()
     Calculator(state, viewModel::onAction, paddingValues)
 }
@@ -50,6 +58,23 @@ fun Calculator(
     onAction: (CalculatorAction) -> Unit,
     paddingValues: PaddingValues
 ) {
+    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+    val isLandscape = with(windowAdaptiveInfo) {
+        if (windowSizeClass.minWidth == WindowSizeClass.WidthSizeClasses.Compact) {
+            false
+        } else if (
+            windowSizeClass.minHeight == WindowSizeClass.HeightSizeClasses.Compact
+        ) {
+            true
+        } else if (
+            windowPosture.isTabletop
+        ) {
+            false
+        } else {
+            false
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -137,12 +162,16 @@ fun Calculator(
                 )
             ) { _, text ->
 
-                CalculatorButton(
+                val buttonSizeModifier = if (isLandscape) {
                     Modifier
-                        .aspectRatio(1f)
-                        .weight(1f)
-                        .animateContentSize()
-                    ,text = text, color = when (text) {
+                        .fillMaxWidth()
+                        .weight(0.5f)
+                } else {
+                    Modifier.size(85.dp)
+                }
+                CalculatorButton(
+                    buttonSizeModifier
+                        .animateItem(), text = text, color = when (text) {
                         "÷", "×", "-", "+", "%", "⌫", "AC", "=" -> Color(orange.value)
                         else -> MaterialTheme.colorScheme.onSurface
                     }

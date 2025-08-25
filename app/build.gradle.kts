@@ -72,7 +72,11 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     // Material Icon Extension
     implementation(libs.androidx.material.icons.extended)
-
+    implementation(libs.androidx.adaptive)
+    implementation(libs.androidx.adaptive.layout)
+    implementation(libs.androidx.adaptive.navigation)
+    // navigation suite
+    implementation(libs.androidx.material3.adaptive.navigation.suite)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

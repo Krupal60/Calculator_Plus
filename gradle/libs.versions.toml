@@ -44,7 +44,10 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
 review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "reviewKtx" }
-
+androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }
+androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation" }
+androidx-material3-adaptive-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
