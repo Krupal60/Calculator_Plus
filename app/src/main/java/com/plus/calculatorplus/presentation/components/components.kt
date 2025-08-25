@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
 package com.plus.calculatorplus.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
@@ -27,6 +29,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -72,12 +75,11 @@ import ir.kaaveh.sdpcompose.ssp
 import kotlin.math.roundToInt
 
 @Composable
-fun CalculatorButton(modifier: Modifier ,text: String, color: Color, onClick: () -> Unit) {
+fun CalculatorButton(modifier: Modifier, text: String, color: Color, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .clip(CircleShape)
-            .then(modifier)
-          ,
+            .then(modifier),
         elevation = CardDefaults.cardElevation(10.dp),
         colors = CardColors(
             containerColor = color,
@@ -244,7 +246,7 @@ fun customCard2(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    modifier = Modifier.weight(0.7f),
+                    modifier = Modifier,
                     onClick = { value.value = (value.value.toInt() - 1).toString() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
@@ -261,11 +263,12 @@ fun customCard2(
                     keyboardActions = KeyboardActions(onDone = {
                         focusManager.clearFocus()
                     }),
-                    singleLine = true
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(textAlign = TextAlign.Center)
                 )
 
                 IconButton(
-                    modifier = Modifier.weight(0.7f),
+                    modifier = Modifier,
                     onClick = { value.value = (value.value.toInt() + 1).toString() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
