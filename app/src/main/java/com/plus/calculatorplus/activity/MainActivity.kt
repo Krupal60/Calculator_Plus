@@ -11,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
@@ -51,6 +54,10 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.plus.calculatorplus.R
 import com.plus.calculatorplus.presentation.navigation.Screen
 import com.plus.calculatorplus.presentation.navigation.navHost
+import com.plus.calculatorplus.presentation.util.HeightSizeClasses
+import com.plus.calculatorplus.presentation.util.WidthSizeClasses
+import com.plus.calculatorplus.presentation.util.minHeight
+import com.plus.calculatorplus.presentation.util.minWidth
 import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.viewmodel.SplashScreenViewModel
 import ir.kaaveh.sdpcompose.ssp
@@ -141,12 +148,30 @@ class MainActivity : ComponentActivity() {
                         )
                         // Add more routes as needed
                     )
+                    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+                    val isLandscape = with(windowAdaptiveInfo) {
+                        if (windowSizeClass.minWidth == WindowSizeClass.WidthSizeClasses.Compact) {
+                            false
+                        } else if (
+                            windowSizeClass.minHeight == WindowSizeClass.HeightSizeClasses.Compact
+                        ) {
+                            true
+                        } else if (
+                            windowPosture.isTabletop
+                        ) {
+                            false
+                        } else {
+                            false
+                        }
+                    }
                     Scaffold(topBar = {
-                        MyAppBar(
-                            currentRoute?.destination?.route,
-                            navController,
-                            routeToTitleAndIcon
-                        )
+                        AnimatedVisibility(!isLandscape) {
+                            MyAppBar(
+                                currentRoute?.destination?.route,
+                                navController,
+                                routeToTitleAndIcon
+                            )
+                        }
                     }, modifier = Modifier.safeDrawingPadding()) {
                         navHost(navController, it)
                     }
