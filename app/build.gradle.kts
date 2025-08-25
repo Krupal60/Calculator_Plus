@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.androidx.adaptive.navigation)
     // navigation suite
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.fragment.ktx) // Added fragment dependency
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
