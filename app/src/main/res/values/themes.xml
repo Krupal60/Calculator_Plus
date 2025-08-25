@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.CalculatorPlus" parent="android:Theme.Material.NoActionBar" >
-        <item name="android:windowSplashScreenBackground" tools:targetApi="s">#00171B</item>
+    <style name="Theme.CalculatorPlus.Starting" parent="android:Theme.Material.NoActionBar" >
+        <item name="android:windowSplashScreenBackground" tools:targetApi="s">@color/bg</item>
         <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="s">@drawable/calculator</item>
         <item name="android:windowSplashScreenAnimationDuration" tools:ignore="NewApi">1000</item>
         <item name="android:windowSplashScreenBehavior" tools:ignore="NewApi">icon_preferred</item>
+        <item name="postSplashScreenTheme">@style/Theme.CalculatorPlus</item>
+    </style>
+
+    <style name="Theme.CalculatorPlus" parent="android:Theme.Material.Light.NoActionBar" >
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:enforceNavigationBarContrast" tools:ignore="NewApi">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
 </resources>

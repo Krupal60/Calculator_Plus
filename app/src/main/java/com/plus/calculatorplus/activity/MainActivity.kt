@@ -1,10 +1,18 @@
 package com.plus.calculatorplus.activity
 
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast.LENGTH_LONG
+import android.widget.Toast.makeText
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
@@ -22,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -33,6 +42,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.plus.calculatorplus.R
 import com.plus.calculatorplus.presentation.navigation.Screen
 import com.plus.calculatorplus.presentation.navigation.navHost
@@ -42,8 +57,25 @@ import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private lateinit var appUpdateManager: AppUpdateManager
+    private val activityResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            // handle callback
+            if (result.resultCode != RESULT_OK) {
+                makeText(
+                    this,
+                    "Update flow failed! Result code: ${result.resultCode}",
+                    LENGTH_LONG
+                ).show()
+            }
+        }
     override fun onCreate(savedInstanceState: Bundle?) {
+        appUpdateManager = AppUpdateManagerFactory.create(this)
         val splash = installSplashScreen()
+        enableEdgeToEdge(
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+        )
         super.onCreate(savedInstanceState)
         val viewModel: SplashScreenViewModel by viewModels()
         lifecycleScope.launch {
@@ -53,13 +85,36 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         setContent {
+            val context = LocalContext.current
+            val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)
+                ) {
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        activityResultLauncher,
+                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                    )
+                }
+            }
             CalculatorPlusTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
                 ) {
+                    val manager = ReviewManagerFactory.create(context)
+                    val request = manager.requestReviewFlow()
+                    request.addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val reviewInfo = task.result
+                            manager.launchReviewFlow(this, reviewInfo)
+                        }
+                    }
                     val navController = rememberNavController()
                     val currentRoute by navController.currentBackStackEntryAsState()
                     val routeToTitleAndIcon = mapOf(
@@ -77,10 +132,10 @@ class MainActivity : ComponentActivity() {
                         "bmi" to Pair(
                             "BMI Calculator",
                             Icons.Default.KeyboardArrowDown
-                        ),"emi" to Pair(
+                        ), "emi" to Pair(
                             "EMI Calculator",
                             Icons.Default.KeyboardArrowDown
-                        ),"converter" to Pair(
+                        ), "converter" to Pair(
                             "Converter tools",
                             Icons.AutoMirrored.Filled.ArrowBack
                         )
@@ -92,13 +147,31 @@ class MainActivity : ComponentActivity() {
                             navController,
                             routeToTitleAndIcon
                         )
-                    }) {
+                    }, modifier = Modifier.safeDrawingPadding()) {
                         navHost(navController, it)
                     }
 
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager
+            .appUpdateInfo
+            .addOnSuccessListener { appUpdateInfo ->
+                if (appUpdateInfo.updateAvailability()
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                ) {
+                    // If an in-app update is already running, resume the update.
+                    appUpdateManager.startUpdateFlowForResult(
+                        appUpdateInfo,
+                        activityResultLauncher,
+                        AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
+                    )
+                }
+            }
     }
 }
 

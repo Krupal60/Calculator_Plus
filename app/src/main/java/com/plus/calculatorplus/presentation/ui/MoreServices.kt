@@ -39,17 +39,17 @@ fun MoreServices(navController: NavHostController, paddingValues: PaddingValues)
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
             Alignment.CenterVertically
         ) {
-            CustomCard(
-                backgroundColor =  MaterialTheme.colorScheme.inverseOnSurface,
-                modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
-                icon = R.drawable.scale,
-                title = "Converter",
-                onClick = {
-                    navController.navigate(Screen.ConverterScreen.route) {
-                        launchSingleTop = true
-                        popUpTo(Screen.MoreScreen.route)
-                    }
-                })
+//            CustomCard(
+//                backgroundColor =  MaterialTheme.colorScheme.inverseOnSurface,
+//                modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+//                icon = R.drawable.scale,
+//                title = "Converter",
+//                onClick = {
+//                    navController.navigate(Screen.ConverterScreen.route) {
+//                        launchSingleTop = true
+//                        popUpTo(Screen.MoreScreen.route)
+//                    }
+//                })
 
             CustomCard(
                 backgroundColor =  MaterialTheme.colorScheme.inverseOnSurface,

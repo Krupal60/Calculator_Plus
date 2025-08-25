@@ -9,18 +9,38 @@ object Utils {
     fun getMoneyInWords(number: Double): String {
         when {
             number >= 10000000 -> {
-                return "₹ " + String.format("%.2f", number / 10000000) + " Cr"
+                return buildString {
+                    append("₹ ")
+                    append(String.format(buildString {
+                        append("%.2f")
+                    }, number / 10000000))
+                    append(" Cr")
+                }
             }
 
             number >= 100000 -> {
-                return "₹ " + String.format("%.2f", number / 100000) + " L"
+                return buildString {
+                    append("₹ ")
+                    append(String.format(buildString {
+                        append("%.2f")
+                    }, number / 100000))
+                    append(" L")
+                }
             }
 
             number >= 10000 -> {
-                return "₹ " + String.format("%.2f", number / 1000) + " K"
+                return buildString {
+                    append("₹ ")
+                    append(String.format(buildString {
+                        append("%.2f")
+                    }, number / 1000))
+                    append(" K")
+                }
             }
         }
-        val format = NumberFormat.getCurrencyInstance(Locale("en", "in"))
+        val format = NumberFormat.getCurrencyInstance(
+            Locale.Builder().setLanguage("en").setRegion("IN").build()
+        )
         format.maximumFractionDigits = 0
         return format.format(number)
     }

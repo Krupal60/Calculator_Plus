@@ -55,9 +55,9 @@ fun EmiScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
 
-    val loanAmount = remember { mutableStateOf("100000") }
-    val interestRate = remember { mutableStateOf("6") }
-    val loanYears = remember { mutableStateOf("5") }
+    val loanAmount = remember { mutableStateOf("10000") }
+    val interestRate = remember { mutableStateOf("2") }
+    val loanYears = remember { mutableStateOf("1") }
 
     Column(
         Modifier
@@ -73,7 +73,7 @@ fun EmiScreen(
 
         loanAmount.value = sliderWithText(
             "loan Amount",
-            100000, 10000000,
+            10000, 10000000,
             actionType = ImeAction.Done,
             preffix = "₹",
             suffix = "",
@@ -82,7 +82,7 @@ fun EmiScreen(
 
         interestRate.value = sliderWithText(
             "Interest Rate (p.a)",
-            6, 35,
+            4, 35,
             actionType = ImeAction.Done,
             preffix = "",
             suffix = "%",
@@ -91,7 +91,7 @@ fun EmiScreen(
 
         loanYears.value = sliderWithText(
             "loan Years",
-            5,
+            1,
             35,
             actionType = ImeAction.Done,
             preffix = "",
