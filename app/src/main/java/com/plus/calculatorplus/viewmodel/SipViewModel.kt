@@ -5,6 +5,7 @@ import com.plus.calculatorplus.data.model.sip.OnSipAction
 import com.plus.calculatorplus.data.model.sip.SipDetailState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class SipViewModel : ViewModel() {
 
@@ -56,9 +57,9 @@ class SipViewModel : ViewModel() {
 
 
         state.value = state.value.copy(
-            totalAmount = accumulatedAmount.toInt().toString(),
-            estimateReturnsAmount = estimateReturn.toInt().toString(),
-            investedAmount = totalInvestedAmount.toInt().toString()
+            totalAmount = accumulatedAmount.roundToInt().toString(),
+            estimateReturnsAmount = estimateReturn.roundToInt().toString(),
+            investedAmount = totalInvestedAmount.roundToInt().toString()
         )
     }
 
@@ -79,9 +80,9 @@ class SipViewModel : ViewModel() {
         val estimateReturn = totalValue - totalInvestedAmount
 
         state.value = state.value.copy(
-            totalAmount = totalValue.toInt().toString(),
-            estimateReturnsAmount = estimateReturn.toInt().toString(),
-            investedAmount = totalInvestedAmount.toInt().toString()
+            totalAmount = totalValue.roundToInt().toString(),
+            estimateReturnsAmount = estimateReturn.roundToInt().toString(),
+            investedAmount = totalInvestedAmount.roundToInt().toString()
         )
     }
 

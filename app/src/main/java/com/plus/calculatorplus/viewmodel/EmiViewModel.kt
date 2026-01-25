@@ -5,6 +5,7 @@ import com.plus.calculatorplus.data.model.emi.EmiDetailState
 import com.plus.calculatorplus.data.model.emi.OnEmiAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class EmiViewModel : ViewModel() {
 
@@ -47,9 +48,9 @@ class EmiViewModel : ViewModel() {
 
         // Update state
         state.value = state.value.copy(
-            monthlyEmi = monthlyEmi.toInt().toString(),
-            totalAmount = (loanAmount + totalInterest).toInt().toString(),
-            totalInterest = totalInterest.toInt().toString(),
+            monthlyEmi = monthlyEmi.roundToInt().toString(),
+            totalAmount = (loanAmount + totalInterest).roundToInt().toString(),
+            totalInterest = totalInterest.roundToInt().toString(),
             loanAmount = loanAmountStr
         )
     }
