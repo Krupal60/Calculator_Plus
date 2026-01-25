@@ -156,6 +156,9 @@ class MainActivity : ComponentActivity() {
                         ), Screen.DiscountScreen::class to Pair(
                             "Discount Calculator",
                             Icons.Default.KeyboardArrowDown
+                        ), Screen.FdScreen::class to Pair(
+                            "FD Calculator",
+                            Icons.Default.KeyboardArrowDown
                         )
                     )
 

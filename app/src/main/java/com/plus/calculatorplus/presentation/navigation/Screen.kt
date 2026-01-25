@@ -25,4 +25,7 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object DiscountScreen : Screen
+
+    @Serializable
+    data object FdScreen : Screen
 }

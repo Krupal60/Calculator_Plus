@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -55,7 +56,7 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 10.dp),
-                icon = R.drawable.percent_discount, // Using more2 as placeholder for Discount
+                icon = R.drawable.percent_discount,
                 title = "Discount",
                 onClick = {
                     navigator.navigate(Screen.DiscountScreen)
@@ -90,6 +91,29 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
                 onClick = {
                     navigator.navigate(Screen.BmiScreen)
                 })
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.sdp),
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+            Alignment.CenterVertically
+        ) {
+            CustomCard(
+                backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp),
+                icon = R.drawable.fd,
+                title = "FD",
+                onClick = {
+                    navigator.navigate(Screen.FdScreen)
+                })
+
+            Spacer(modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 10.dp))
         }
 
     }

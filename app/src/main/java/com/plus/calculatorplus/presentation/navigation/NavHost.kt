@@ -9,6 +9,7 @@ import com.plus.calculatorplus.presentation.ui.CalculatorMain
 import com.plus.calculatorplus.presentation.ui.ConvertersScreenMain
 import com.plus.calculatorplus.presentation.ui.DiscountScreenMain
 import com.plus.calculatorplus.presentation.ui.EmiScreenMain
+import com.plus.calculatorplus.presentation.ui.FdScreenMain
 import com.plus.calculatorplus.presentation.ui.MoreServices
 import com.plus.calculatorplus.presentation.ui.SipScreenMain
 
@@ -39,6 +40,9 @@ fun NavHost3(
             }
             entry<Screen.DiscountScreen> {
                 DiscountScreenMain(paddingValues)
+            }
+            entry<Screen.FdScreen> {
+                FdScreenMain(paddingValues)
             }
         }),
         onBack = { navigator.goBack() }
