@@ -23,81 +23,103 @@ class CalculationViewModel : ViewModel() {
         }
     }
 
-    private fun enterOperation(operation: CalculatorOperation) {
-        // Update operation
-        if (state.value.number1.isNotBlank()){
-            state.value = state.value.copy(operation = operation)
-        }
-        // Perform calculation if both numbers are provided
-        if (state.value.number1.isNotBlank() && state.value.number2.isNotBlank()) {
-            calculateResult()
-            state.value = state.value.copy(operation = operation)
-        }
+    private fun enterNumber(number: String) {
+        val current = state.value
 
+        if (current.operation == null) {
+            state.value = current.copy(
+                number1 = current.number1 + number
+            )
+        } else {
+            state.value = current.copy(
+                number2 = current.number2 + number
+            )
+        }
     }
 
-    private fun enterNumber(number: String) {
-        if (number.contains("00")){
-            if (state.value.operation == null) {
-                state.value = state.value.copy(number1 = state.value.number1 + number.toInt() +  number.toInt())
-            } else {
-                state.value = state.value.copy(number2 = state.value.number2 + number.toInt() +  number.toInt())
+    private fun enterOperation(operation: CalculatorOperation) {
+        val current = state.value
+
+        if (current.number1.isBlank()) return
+
+        // If second number exists, calculate first (chaining)
+        if (current.number2.isNotBlank()) {
+            calculateResult()
+        }
+
+        state.value = state.value.copy(operation = operation)
+    }
+
+    private fun enterDecimal() {
+        val current = state.value
+
+        if (current.operation == null) {
+            if (!current.number1.contains(".")) {
+                val value =
+                    if (current.number1.isBlank()) "0." else current.number1 + "."
+                state.value = current.copy(number1 = value)
             }
-        }else {
-            if (state.value.operation == null) {
-                state.value = state.value.copy(number1 = state.value.number1 + number.toInt())
-            } else {
-                state.value = state.value.copy(number2 = state.value.number2 + number.toInt())
+        } else {
+            if (!current.number2.contains(".")) {
+                val value =
+                    if (current.number2.isBlank()) "0." else current.number2 + "."
+                state.value = current.copy(number2 = value)
             }
         }
     }
 
     private fun delete() {
-        if (state.value.number2.isNotBlank()) {
-            state.value = state.value.copy(number2 = state.value.number2.dropLast(1))
-            return
-        }
-        if (state.value.operation != null) {
-            state.value = state.value.copy(operation = null)
-            return
-        }
-        if (state.value.number1.isNotBlank()) {
-            state.value = state.value.copy(number1 = state.value.number1.dropLast(1))
-            return
-        }
-    }
+        val current = state.value
 
-    private fun enterDecimal() {
-        if (state.value.operation == null && !state.value.number1.contains(".") && state.value.number1.isNotBlank()) {
-            state.value = state.value.copy(number1 = state.value.number1 + ".")
-            return
-        }
-        if (!state.value.number2.contains(".") && state.value.number2.isNotBlank()) {
-            state.value = state.value.copy(number2 = state.value.number2 + ".")
-            return
+        when {
+            current.number2.isNotBlank() ->
+                state.value = current.copy(
+                    number2 = current.number2.dropLast(1)
+                )
+
+            current.operation != null ->
+                state.value = current.copy(operation = null)
+
+            current.number1.isNotBlank() ->
+                state.value = current.copy(
+                    number1 = current.number1.dropLast(1)
+                )
         }
     }
 
     private fun calculateResult() {
-        val number1 = state.value.number1.toDoubleOrNull() ?: return
-        val number2 = state.value.number2.toDoubleOrNull() ?: return
-        val operation = state.value.operation ?: return
+        val current = state.value
 
-        val result = when (operation) {
-            CalculatorOperation.Addition -> number1 + number2
-            CalculatorOperation.Division -> number1 / number2
-            CalculatorOperation.Multiplication -> number1 * number2
-            CalculatorOperation.Percentage -> number1 % number2
-            CalculatorOperation.Subtraction -> number1 - number2
+        val n1 = current.number1.toDoubleOrNull() ?: return
+        val n2 = current.number2.toDoubleOrNull() ?: return
+        val op = current.operation ?: return
+
+        val result = when (op) {
+            CalculatorOperation.Addition -> n1 + n2
+            CalculatorOperation.Subtraction -> n1 - n2
+            CalculatorOperation.Multiplication -> n1 * n2
+            CalculatorOperation.Division -> {
+                if (n2 == 0.0) n1
+                else
+                    n1 / n2
+            }
+
+            CalculatorOperation.Percentage -> (n1 * n2) / 100
         }
 
-        // Update state with result
-        val integerPart = result.toInt()
-        state.value = state.value.copy(
-            number1 = if (integerPart.toDouble() == result) integerPart.toString() else result.toString(),
+        state.value = current.copy(
+            number1 = formatResult(result),
             number2 = "",
             operation = null
         )
+    }
+
+    private fun formatResult(value: Double): String {
+        return if (value % 1 == 0.0) {
+            value.toLong().toString()
+        } else {
+            value.toString()
+        }
     }
 
     private fun clearState() {
