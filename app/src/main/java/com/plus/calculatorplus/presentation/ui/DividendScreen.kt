@@ -30,36 +30,35 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.plus.calculatorplus.Calculator
-import com.plus.calculatorplus.data.model.swp.OnSwpAction
-import com.plus.calculatorplus.data.model.swp.SwpDetailState
+import com.plus.calculatorplus.data.model.dividend.DividendDetailState
+import com.plus.calculatorplus.data.model.dividend.OnDividendAction
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
-import com.plus.calculatorplus.presentation.validation.swpValidation
-import com.plus.calculatorplus.viewmodel.SwpViewModel
+import com.plus.calculatorplus.presentation.validation.dividendValidation
+import com.plus.calculatorplus.viewmodel.DividendViewModel
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 @Composable
-fun SwpScreenMain(paddingValues: PaddingValues, viewModel: SwpViewModel = viewModel()) {
+fun DividendScreenMain(paddingValues: PaddingValues, viewModel: DividendViewModel = viewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    SwpScreen(paddingValues, state, viewModel::onAction)
+    DividendScreen(paddingValues, state, viewModel::onAction)
 }
 
 @Composable
-fun SwpScreen(
+fun DividendScreen(
     paddingValues: PaddingValues,
-    state: State<SwpDetailState>,
-    onAction: (OnSwpAction) -> Unit
+    state: State<DividendDetailState>,
+    onAction: (OnDividendAction) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
 
-    var totalInvestment by rememberSaveable { mutableStateOf("100000") }
-    var withdrawalPerMonth by rememberSaveable { mutableStateOf("1000") }
-    var expectedReturnRate by rememberSaveable { mutableStateOf("10") }
-    var timePeriodYears by rememberSaveable { mutableStateOf("5") }
+    var sharePrice by rememberSaveable { mutableStateOf("10000") }
+    var dividendPerShare by rememberSaveable { mutableStateOf("200") }
+    var numberOfShares by rememberSaveable { mutableStateOf("10") }
 
     Column(
         Modifier
@@ -74,81 +73,45 @@ fun SwpScreen(
     ) {
 
         SliderWithText(
-            "Total Investment",
-            100000, 10000000,
-            onValueChange = { totalInvestment = it },
+            "Share Price",
+            10000, 100000,
+            onValueChange = { sharePrice = it },
             actionType = ImeAction.Done,
             prefix = "₹",
             suffix = "",
-            isError = !swpValidation(
-                totalInvestment,
-                withdrawalPerMonth,
-                expectedReturnRate,
-                timePeriodYears
-            ).first,
+            isError = !dividendValidation(sharePrice, dividendPerShare, numberOfShares).first,
             visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
         )
 
         SliderWithText(
-            "Withdrawal Per Month",
-            1000, 500000,
-            onValueChange = { withdrawalPerMonth = it },
+            "Dividend Per Share",
+            200, 10000,
+            onValueChange = { dividendPerShare = it },
             actionType = ImeAction.Done,
             prefix = "₹",
             suffix = "",
-            isError = !swpValidation(
-                totalInvestment,
-                withdrawalPerMonth,
-                expectedReturnRate,
-                timePeriodYears
-            ).first,
+            isError = !dividendValidation(sharePrice, dividendPerShare, numberOfShares).first,
             visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
         )
 
         SliderWithText(
-            "Expected Return Rate (p.a)",
-            10, 30,
-            onValueChange = { expectedReturnRate = it },
+            "Number of Shares",
+            10, 10000,
+            onValueChange = { numberOfShares = it },
             actionType = ImeAction.Done,
             prefix = "",
-            suffix = "%",
-            isError = !swpValidation(
-                totalInvestment,
-                withdrawalPerMonth,
-                expectedReturnRate,
-                timePeriodYears
-            ).first
-        )
-
-        SliderWithText(
-            "Time Period (Years)",
-            5, 50,
-            onValueChange = { timePeriodYears = it },
-            actionType = ImeAction.Done,
-            prefix = "",
-            suffix = "Yr",
-            isError = !swpValidation(
-                totalInvestment,
-                withdrawalPerMonth,
-                expectedReturnRate,
-                timePeriodYears
-            ).first
+            suffix = "",
+            isError = !dividendValidation(sharePrice, dividendPerShare, numberOfShares).first
         )
 
         Button(modifier = Modifier.fillMaxWidth(), onClick = {
-            val validationResult = swpValidation(
-                totalInvestment,
-                withdrawalPerMonth,
-                expectedReturnRate,
-                timePeriodYears
-            )
+            val validationResult = dividendValidation(sharePrice, dividendPerShare, numberOfShares)
             if (validationResult.first) {
                 onAction(
-                    OnSwpAction.CalculateSwp(
-                        totalInvestment = totalInvestment,
-                        withdrawalPerMonth = withdrawalPerMonth,
-                        expectedReturnRate = expectedReturnRate,
-                        timePeriodYears = timePeriodYears
+                    OnDividendAction.CalculateDividend(
+                        sharePrice = sharePrice,
+                        dividendPerShare = dividendPerShare,
+                        numberOfShares = numberOfShares
                     )
                 )
                 coroutineScope.launch {
@@ -192,8 +155,8 @@ fun SwpScreen(
                         .padding(top = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Total Investment")
-                    Text(text = getMoneyInWords(state.value.totalInvestment.toDouble()))
+                    Text(text = "Total Dividend")
+                    Text(text = getMoneyInWords(state.value.totalDividend.toDouble()))
                 }
                 Row(
                     modifier = Modifier
@@ -201,8 +164,8 @@ fun SwpScreen(
                         .padding(top = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Total Withdrawal")
-                    Text(text = getMoneyInWords(state.value.totalWithdrawal.toDouble()))
+                    Text(text = "Dividend Yield")
+                    Text(text = "${state.value.dividendYield}%")
                 }
                 Row(
                     modifier = Modifier
@@ -210,8 +173,8 @@ fun SwpScreen(
                         .padding(vertical = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = "Final Value")
-                    Text(text = getMoneyInWords(state.value.finalValue.toDouble()))
+                    Text(text = "Annual Dividend")
+                    Text(text = getMoneyInWords(state.value.annualDividend.toDouble()))
                 }
             }
         }

@@ -79,7 +79,7 @@ fun RetirementScreen(
 
         SliderWithText(
             "Current Age",
-            currentAge.toInt(), 100,
+            22, 100,
             onValueChange = { currentAge = it },
             actionType = ImeAction.Done,
             prefix = "",
@@ -94,7 +94,7 @@ fun RetirementScreen(
 
         SliderWithText(
             "Retirement Age",
-            retirementAge.toInt(), 100,
+            50, 100,
             onValueChange = { retirementAge = it },
             actionType = ImeAction.Done,
             prefix = "",
@@ -109,7 +109,7 @@ fun RetirementScreen(
 
         SliderWithText(
             "Monthly Investment",
-            monthlySavings.toInt(), 1000000,
+            10000, 1000000,
             onValueChange = { monthlySavings = it },
             actionType = ImeAction.Done,
             prefix = "₹",
@@ -125,7 +125,7 @@ fun RetirementScreen(
 
         SliderWithText(
             "Expected Return Rate (p.a)",
-            expectedReturnRate.toInt(), 30,
+            10, 30,
             onValueChange = { expectedReturnRate = it },
             actionType = ImeAction.Done,
             prefix = "",
@@ -140,7 +140,7 @@ fun RetirementScreen(
 
         SliderWithText(
             "Current Savings",
-            currentSavings.toInt(), 10000000,
+            0, 10000000,
             onValueChange = { currentSavings = it },
             actionType = ImeAction.Done,
             prefix = "₹",

@@ -8,6 +8,7 @@ import com.plus.calculatorplus.presentation.ui.BmiScreenMain
 import com.plus.calculatorplus.presentation.ui.CalculatorMain
 import com.plus.calculatorplus.presentation.ui.ConvertersScreenMain
 import com.plus.calculatorplus.presentation.ui.DiscountScreenMain
+import com.plus.calculatorplus.presentation.ui.DividendScreenMain
 import com.plus.calculatorplus.presentation.ui.EmiScreenMain
 import com.plus.calculatorplus.presentation.ui.FdScreenMain
 import com.plus.calculatorplus.presentation.ui.MoreServices
@@ -51,6 +52,9 @@ fun NavHost3(
             }
             entry<Screen.RetirementScreen> {
                 RetirementScreenMain(paddingValues)
+            }
+            entry<Screen.DividendScreen> {
+                DividendScreenMain(paddingValues)
             }
         }),
         onBack = { navigator.goBack() }

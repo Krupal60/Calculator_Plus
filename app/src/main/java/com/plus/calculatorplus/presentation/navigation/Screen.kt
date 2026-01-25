@@ -34,4 +34,7 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object RetirementScreen : Screen
+
+    @Serializable
+    data object DividendScreen : Screen
 }

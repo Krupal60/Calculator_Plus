@@ -74,7 +74,7 @@ fun FdScreen(
 
         SliderWithText(
             "Investment Amount",
-            1000, 10000000,
+            10000, 10000000,
             onValueChange = { investmentAmount = it },
             actionType = ImeAction.Done,
             prefix = "₹",
@@ -85,7 +85,7 @@ fun FdScreen(
 
         SliderWithText(
             "Rate of Interest (p.a)",
-            1, 20,
+            7, 20,
             onValueChange = { interestRate = it },
             actionType = ImeAction.Done,
             prefix = "",
@@ -95,7 +95,7 @@ fun FdScreen(
 
         SliderWithText(
             "Time Period (Years)",
-            1, 30,
+            5, 30,
             onValueChange = { years = it },
             actionType = ImeAction.Done,
             prefix = "",

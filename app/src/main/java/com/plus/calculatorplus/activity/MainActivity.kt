@@ -165,6 +165,9 @@ class MainActivity : ComponentActivity() {
                         ), Screen.RetirementScreen::class to Pair(
                             "Retirement Calculator",
                             Icons.Default.KeyboardArrowDown
+                        ), Screen.DividendScreen::class to Pair(
+                            "Dividend Calculator",
+                            Icons.Default.KeyboardArrowDown
                         )
                     )
 
