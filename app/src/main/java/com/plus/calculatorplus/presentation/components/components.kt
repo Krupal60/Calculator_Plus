@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -116,7 +117,8 @@ fun SliderWithText(
     prefix: String,
     suffix: String,
     isError: Boolean,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     var value by remember { mutableStateOf("$startNumber") }
     var text by remember { mutableStateOf("$startNumber") }
@@ -170,6 +172,7 @@ fun SliderWithText(
                         }
                     },
                     isError = isError,
+                    visualTransformation = visualTransformation,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number, imeAction = actionType
                     ),

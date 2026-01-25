@@ -37,6 +37,7 @@ import com.plus.calculatorplus.presentation.components.CustomSelectionCard
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.PieChart
 import com.plus.calculatorplus.presentation.components.SliderWithText
+import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.validation.interestRateValidation
 import com.plus.calculatorplus.presentation.validation.lumsumValidation
 import com.plus.calculatorplus.presentation.validation.monthlyValidation
@@ -115,7 +116,8 @@ fun SipScreen(
                 actionType = ImeAction.Done,
                 prefix = "₹",
                 suffix = "",
-                isError = !monthlyValidation(monthlyAmount = monthlyInvestment.value).first
+                isError = !monthlyValidation(monthlyAmount = monthlyInvestment.value).first,
+                visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
         }
         AnimatedVisibility(visible = lumSum) {
@@ -126,7 +128,8 @@ fun SipScreen(
                 actionType = ImeAction.Done,
                 prefix = "₹",
                 suffix = "",
-                isError = !lumsumValidation(lumSum, lumsumInvestment.value).first
+                isError = !lumsumValidation(lumSum, lumsumInvestment.value).first,
+                visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
         }
 

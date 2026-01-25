@@ -31,6 +31,7 @@ import com.plus.calculatorplus.data.model.emi.EmiDetailState
 import com.plus.calculatorplus.data.model.emi.OnEmiAction
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.SliderWithText
+import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.emiValidation
 import com.plus.calculatorplus.presentation.validation.loanAmountValidation
@@ -78,7 +79,8 @@ fun EmiScreen(
             actionType = ImeAction.Done,
             prefix = "₹",
             suffix = "",
-            isError = !loanAmountValidation(loanAmount.value).first
+            isError = !loanAmountValidation(loanAmount.value).first,
+            visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
         )
 
         SliderWithText(
