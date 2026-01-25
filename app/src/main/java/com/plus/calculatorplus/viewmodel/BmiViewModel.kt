@@ -36,6 +36,7 @@ class BmiViewModel : ViewModel() {
                         else -> "Obese"
                     }
                 }
+
                 false -> { // Female interpretation
                     when {
                         bmi < 21.5 -> "Underweight"
@@ -48,8 +49,8 @@ class BmiViewModel : ViewModel() {
         } else {
             "BMI for children requires growth charts and consultation with a healthcare professional."
         }
-            val formatBmi = String.format("%.1f",bmi)
-        state.value =  state.value.copy(bmi = formatBmi, interpretation = interpretation)
+        val formatBmi = String.format(java.util.Locale.ENGLISH, "%.1f", bmi)
+        state.value = state.value.copy(bmi = formatBmi, interpretation = interpretation)
 
     }
 

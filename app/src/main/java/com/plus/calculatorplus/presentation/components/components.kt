@@ -108,15 +108,16 @@ fun CalculatorButton(modifier: Modifier, text: String, color: Color, onClick: ()
 }
 
 @Composable
-fun sliderWithText(
+fun SliderWithText(
     title: String,
     startNumber: Int,
     endNumber: Int,
     actionType: ImeAction,
-    preffix: String,
+    prefix: String,
     suffix: String,
-    isError: Boolean
-): String {
+    isError: Boolean,
+    onValueChange: (String) -> Unit
+) {
     var value by remember { mutableStateOf("$startNumber") }
     var text by remember { mutableStateOf("$startNumber") }
     val focusManager = LocalFocusManager.current
@@ -156,10 +157,11 @@ fun sliderWithText(
                         if (text.isNotBlank()) {
                             value = text
                         }
+                        onValueChange(text)
                     },
                     prefix = {
-                        if (preffix.isNotEmpty()) {
-                            Text(text = preffix)
+                        if (prefix.isNotEmpty()) {
+                            Text(text = prefix)
                         }
                     },
                     suffix = {
@@ -184,6 +186,7 @@ fun sliderWithText(
                 value = value.toFloat(), onValueChange = {
                     value = it.roundToInt().toString()
                     text = value
+                    onValueChange(text)
                 }, valueRange = startNumber.toFloat()..endNumber.toFloat(), colors = SliderColors(
                     inactiveTrackColor = Color.Gray,
                     inactiveTickColor = Color.Gray,
@@ -199,20 +202,20 @@ fun sliderWithText(
             )
         }
     }
-    return text
 }
 
 @Composable
-fun customCard2(
+fun CustomCard2(
     modifier: Modifier,
     text: String,
     endText: String,
     isError: Boolean,
-    startNumber: String
-): String {
+    value: String,
+    onValueChange: (String) -> Unit
+) {
 
     val value = remember {
-        mutableStateOf(startNumber)
+        mutableStateOf(value)
     }
     val focusManager = LocalFocusManager.current
     Card(
@@ -248,7 +251,10 @@ fun customCard2(
             ) {
                 IconButton(
                     modifier = Modifier,
-                    onClick = { value.value = (value.value.toInt() - 1).toString() }) {
+                    onClick = {
+                        value.value = (value.value.toInt() - 1).toString()
+                        onValueChange(value.value)
+                    }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
                         contentDescription = "Minus Number"
@@ -257,6 +263,7 @@ fun customCard2(
                 OutlinedTextField(
                     modifier = modifier.weight(1f), value = value.value, onValueChange = {
                         value.value = it
+                        onValueChange(it)
                     },
                     isError = isError, keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
@@ -270,7 +277,10 @@ fun customCard2(
 
                 IconButton(
                     modifier = Modifier,
-                    onClick = { value.value = (value.value.toInt() + 1).toString() }) {
+                    onClick = {
+                        value.value = (value.value.toInt() + 1).toString()
+                        onValueChange(value.value)
+                    }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
                         contentDescription = "Plus Number"
@@ -293,31 +303,55 @@ fun customCard2(
             }
 
         }
-
-
     }
-    return value.value
 }
 
 
 @Composable
-fun heightSliderWithText(
+fun HeightSliderWithText(
     modifier: Modifier,
     title: String = "Height",
     startNumber: Int,
     endNumber: Int,
     actionType: ImeAction,
-    isError: Boolean
-): String {
+    isError: Boolean,
+    onValueChange: (String) -> Unit
+) {
     var value by remember { mutableStateOf("150") }
     var valueFt by remember { mutableStateOf("5") }
     var valueIn by remember { mutableStateOf("0") }
     var text by remember { mutableStateOf("150") }
     var textFt by remember { mutableStateOf("5") }
     var textIn by remember { mutableStateOf("0") }
-    var textFtToCm by remember { mutableStateOf("1") }
     var isCm by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+
+    // Logic moved from the bottom of the function to a LaunchedEffect
+    LaunchedEffect(isCm, text, textFt, textIn) {
+        val finalValue = if (isCm) {
+            text
+        } else {
+            val textFtToCm = when {
+                textFt.isNotEmpty() && textIn.isNotEmpty() && textIn != "0" && textFt != "0" -> {
+                    ((textFt.toDouble() * 30.48) + (textIn.toDouble() * 2.54)).roundToInt()
+                        .toString()
+                }
+
+                textFt.isNotEmpty() && textFt != "0" -> {
+                    (textFt.toDouble() * 30.48).roundToInt().toString()
+                }
+
+                else -> {
+                    30.48.roundToInt().toString()
+                }
+            }
+            onValueChange(textFtToCm)
+        }
+        if (isCm) {
+            onValueChange(text)
+        }
+    }
+
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(10.dp),
@@ -542,22 +576,6 @@ fun heightSliderWithText(
             }
         }
     }
-
-
-    textFtToCm = when {
-        textFt.isNotEmpty() && textIn.isNotEmpty() && textIn != "0" && textFt != "0" -> {
-            ((textFt.toDouble() * 30.48) + (textIn.toDouble() * 2.54)).roundToInt().toString()
-        }
-
-        textFt.isNotEmpty() && textFt != "0" -> {
-            (textFt.toDouble() * 30.48).roundToInt().toString()
-        }
-
-        else -> {
-            30.48.roundToInt().toString()
-        }
-    }
-    return if (isCm) text else textFtToCm
 }
 
 

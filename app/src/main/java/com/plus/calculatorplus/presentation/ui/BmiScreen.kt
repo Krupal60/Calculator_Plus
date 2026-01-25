@@ -32,9 +32,9 @@ import com.plus.calculatorplus.data.model.bmi.BmiDetailState
 import com.plus.calculatorplus.data.model.bmi.OnBmiAction
 import com.plus.calculatorplus.presentation.components.BmiResultCard
 import com.plus.calculatorplus.presentation.components.CustomCard
+import com.plus.calculatorplus.presentation.components.CustomCard2
 import com.plus.calculatorplus.presentation.components.CustomText
-import com.plus.calculatorplus.presentation.components.customCard2
-import com.plus.calculatorplus.presentation.components.heightSliderWithText
+import com.plus.calculatorplus.presentation.components.HeightSliderWithText
 import com.plus.calculatorplus.presentation.validation.ageValidate
 import com.plus.calculatorplus.presentation.validation.bmiValidation
 import com.plus.calculatorplus.presentation.validation.cmValidation
@@ -70,7 +70,7 @@ fun BmiScreen(
             .fillMaxSize()
             .verticalScroll(scrollState)
             .padding(
-                top = paddingValues.calculateTopPadding() ,
+                top = paddingValues.calculateTopPadding(),
                 bottom = paddingValues.calculateBottomPadding(),
                 start = 14.dp,
                 end = 14.dp
@@ -110,7 +110,8 @@ fun BmiScreen(
 
             )
         }
-        cm.value = heightSliderWithText(
+        HeightSliderWithText(
+            onValueChange = { cm.value = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -129,13 +130,15 @@ fun BmiScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            weight.value = customCard2(
+            CustomCard2(
                 Modifier.weight(1f),
-                "Weight", "Kg", !weightValidation(weight.value).first,"50"
+                "Weight", "Kg", !weightValidation(weight.value).first, "50",
+                onValueChange = { weight.value = it }
             )
-            age.value = customCard2(
+            CustomCard2(
                 Modifier.weight(1f),
-                "Age", "Years", !ageValidate(age.value).first,"18"
+                "Age", "Years", !ageValidate(age.value).first, "18",
+                onValueChange = { age.value = it }
             )
         }
 

@@ -44,8 +44,8 @@ fun weightValidation(
         }
 
         else -> {
-            val weightInt = weight.toInt()
-            if (weightInt in 2..500 ) {
+            val weightInt = weight.toDouble()
+            if (weightInt in 2.0..500.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Weight need in 2 to 500 Kg range")
@@ -65,8 +65,8 @@ fun ageValidate(
         }
 
         else -> {
-            val ageInt = age.toInt()
-            if (ageInt in 18..120) {
+            val ageInt = age.toDouble()
+            if (ageInt in 18.0..120.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Age need in range 18 to 120 range")
@@ -85,8 +85,8 @@ fun cmValidation(
         }
 
         else -> {
-            val cmInt = cm.toInt()
-            if (cmInt in 50..280) {
+            val cmInt = cm.toDouble()
+            if (cmInt in 50.0..280.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Cm or ft need to be valid")

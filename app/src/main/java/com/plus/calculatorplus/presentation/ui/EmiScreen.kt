@@ -30,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.plus.calculatorplus.data.model.emi.EmiDetailState
 import com.plus.calculatorplus.data.model.emi.OnEmiAction
 import com.plus.calculatorplus.presentation.components.CustomText
-import com.plus.calculatorplus.presentation.components.sliderWithText
+import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.emiValidation
 import com.plus.calculatorplus.presentation.validation.loanAmountValidation
@@ -71,30 +71,33 @@ fun EmiScreen(
             ), verticalArrangement = Arrangement.Top
     ) {
 
-        loanAmount.value = sliderWithText(
+        SliderWithText(
             "loan Amount",
             10000, 10000000,
+            onValueChange = { loanAmount.value = it },
             actionType = ImeAction.Done,
-            preffix = "₹",
+            prefix = "₹",
             suffix = "",
             isError = !loanAmountValidation(loanAmount.value).first
         )
 
-        interestRate.value = sliderWithText(
+        SliderWithText(
             "Interest Rate (p.a)",
             4, 35,
+            onValueChange = { interestRate.value = it },
             actionType = ImeAction.Done,
-            preffix = "",
+            prefix = "",
             suffix = "%",
             isError = !loanInterestRateValidation(interestRate.value).first
         )
 
-        loanYears.value = sliderWithText(
+        SliderWithText(
             "loan Years",
             1,
             35,
+            onValueChange = { loanYears.value = it },
             actionType = ImeAction.Done,
-            preffix = "",
+            prefix = "",
             suffix = "Yr",
             isError = !yearsValidation(loanYears.value).first
         )
@@ -143,7 +146,9 @@ fun EmiScreen(
         }
 
         Card(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
             elevation = CardDefaults.cardElevation(10.dp),
             colors = CardColors(
                 containerColor = MaterialTheme.colorScheme.inverseOnSurface,
@@ -154,31 +159,41 @@ fun EmiScreen(
         )
         {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 15.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = "Monthly EMI")
                     Text(text = getMoneyInWords(state.value.monthlyEmi.toDouble()))
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = "Loan Amount")
                     Text(text = getMoneyInWords(state.value.loanAmount.toDouble()))
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = "Total Interest")
                     Text(text = getMoneyInWords(state.value.totalInterest.toDouble()))
                 }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(text = "Total Amount")

@@ -36,7 +36,7 @@ import com.plus.calculatorplus.data.model.sip.SipDetailState
 import com.plus.calculatorplus.presentation.components.CustomSelectionCard
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.PieChart
-import com.plus.calculatorplus.presentation.components.sliderWithText
+import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.validation.interestRateValidation
 import com.plus.calculatorplus.presentation.validation.lumsumValidation
 import com.plus.calculatorplus.presentation.validation.monthlyValidation
@@ -91,7 +91,9 @@ fun SipScreen(
                     lumSum = false
                 },
                 "Sip Mf fund",
-                modifier = Modifier.weight(1f).padding(end = 10.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 10.dp),
                 backgroundColor = if (!lumSum) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface
             )
             CustomSelectionCard(
@@ -99,45 +101,51 @@ fun SipScreen(
                     lumSum = true
                 },
                 "Lumsum fund",
-                modifier = Modifier.weight(1f).padding(start = 10.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp),
                 backgroundColor = if (lumSum) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface
             )
         }
         AnimatedVisibility(visible = !lumSum) {
-            monthlyInvestment.value = sliderWithText(
+            SliderWithText(
                 "Monthly Amount  (in Rs.)",
                 100, 800000,
+                onValueChange = { monthlyInvestment.value = it },
                 actionType = ImeAction.Done,
-                preffix = "₹",
+                prefix = "₹",
                 suffix = "",
                 isError = !monthlyValidation(monthlyAmount = monthlyInvestment.value).first
             )
         }
         AnimatedVisibility(visible = lumSum) {
-            lumsumInvestment.value = sliderWithText(
+            SliderWithText(
                 "Lumsum Amount (in Rs.)",
                 500, 1000000,
+                onValueChange = { lumsumInvestment.value = it },
                 actionType = ImeAction.Done,
-                preffix = "₹",
+                prefix = "₹",
                 suffix = "",
                 isError = !lumsumValidation(lumSum, lumsumInvestment.value).first
             )
         }
 
-        interestRate.value = sliderWithText(
+        SliderWithText(
             "Interest Rate  (Annual)",
             12, 45,
+            onValueChange = { interestRate.value = it },
             actionType = ImeAction.Done,
-            preffix = "",
+            prefix = "",
             suffix = "%",
             isError = !interestRateValidation(interestRate.value).first
         )
-        investmentYears.value = sliderWithText(
+        SliderWithText(
             "Investment Years",
             5,
             40,
+            onValueChange = { investmentYears.value = it },
             actionType = ImeAction.Done,
-            preffix = "",
+            prefix = "",
             suffix = "Yr",
             isError = !yearsValidation(investmentYears.value).first
         )

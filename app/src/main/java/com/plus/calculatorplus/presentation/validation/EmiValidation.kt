@@ -59,7 +59,7 @@ fun loanInterestRateValidation(
         }
 
         else -> {
-            val interestRateInt = interestRate.toInt()
+            val interestRateInt = interestRate.toDouble()
                if (interestRateInt < 0)  {
                 Pair(false, "Enter valid Interest Rate")
                 }
@@ -84,7 +84,7 @@ fun loanAmountValidation(
         }
 
         else -> {
-            val monthlyAmountInt = loanAmount.toInt()
+            val monthlyAmountInt = loanAmount.toDouble()
             if (monthlyAmountInt >= 10000) {
                 Pair(true, "")
             } else {

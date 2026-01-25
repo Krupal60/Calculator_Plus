@@ -67,8 +67,8 @@ fun interestRateValidation(
         }
 
         else -> {
-            val interestRateInt = interestRate.toInt()
-            if (interestRateInt > 1) {
+            val interestRateInt = interestRate.toDouble()
+            if (interestRateInt > 1.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Interest Rate Must Greater than 1 %")
@@ -86,8 +86,8 @@ fun monthlyValidation(
         }
 
         else -> {
-            val monthlyAmountInt = monthlyAmount.toInt()
-            if (monthlyAmountInt >= 100) {
+            val monthlyAmountInt = monthlyAmount.toDouble()
+            if (monthlyAmountInt >= 100.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Monthly Amount not less than 100 RS.")
@@ -111,8 +111,8 @@ fun lumsumValidation(
         }
 
         else -> {
-            val lumsumAmountInt = lumsumAmount.toInt()
-            if (lumsumAmountInt >= 500) {
+            val lumsumAmountInt = lumsumAmount.toDouble()
+            if (lumsumAmountInt >= 100.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Lumsum Amount not less than 500 RS.")

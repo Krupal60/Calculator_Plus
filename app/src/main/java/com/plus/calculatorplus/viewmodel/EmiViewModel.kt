@@ -24,9 +24,9 @@ class EmiViewModel : ViewModel() {
 
     //EMI = [P x R x (1+R) ^N]/ [(1+R) ^ (N-1)]
     private fun calculateEmi(loanAmountStr: String, loanInterestStr: String, loanYearsStr: String) {
-        val loanAmount = loanAmountStr.toInt()
+        val loanAmount = loanAmountStr.toDouble()
         val annualInterestRate = loanInterestStr.toDouble() / 100.0
-        val loanYears = loanYearsStr.toInt()
+        val loanYears = loanYearsStr.toDouble()
 
         // Calculate monthly interest rate
         val monthlyInterestRate = annualInterestRate / 12.0
@@ -39,17 +39,17 @@ class EmiViewModel : ViewModel() {
                 ((1 + monthlyInterestRate).pow(numberOfPayments) - 1)
 
         // Calculate total payment and total interest
-        val totalPayment = (emi * numberOfPayments).toInt()
+        val totalPayment = (emi * numberOfPayments)
         val totalInterest = (totalPayment - loanAmount)
 
         // Calculate monthly EMI
-        val monthlyEmi = emi.toInt()
+        val monthlyEmi = emi
 
         // Update state
         state.value = state.value.copy(
-            monthlyEmi = monthlyEmi.toString(),
-            totalAmount = (loanAmount + totalInterest).toString(),
-            totalInterest = totalInterest.toString(),
+            monthlyEmi = monthlyEmi.toInt().toString(),
+            totalAmount = (loanAmount + totalInterest).toInt().toString(),
+            totalInterest = totalInterest.toInt().toString(),
             loanAmount = loanAmountStr
         )
     }
