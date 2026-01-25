@@ -59,7 +59,7 @@ fun SwpScreen(
     var totalInvestment by rememberSaveable { mutableStateOf("100000") }
     var withdrawalPerMonth by rememberSaveable { mutableStateOf("1000") }
     var expectedReturnRate by rememberSaveable { mutableStateOf("10") }
-    var timePeriodYears by rememberSaveable { mutableStateOf("1") }
+    var timePeriodYears by rememberSaveable { mutableStateOf("5") }
 
     Column(
         Modifier
