@@ -29,7 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -41,9 +41,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavKey
 import androidx.window.core.layout.WindowSizeClass
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -52,8 +50,10 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.plus.calculatorplus.R
+import com.plus.calculatorplus.presentation.navigation.NavHost
+import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
-import com.plus.calculatorplus.presentation.navigation.navHost
+import com.plus.calculatorplus.presentation.navigation.rememberNavigationState
 import com.plus.calculatorplus.presentation.util.HeightSizeClasses
 import com.plus.calculatorplus.presentation.util.WidthSizeClasses
 import com.plus.calculatorplus.presentation.util.minHeight
@@ -122,32 +122,40 @@ class MainActivity : ComponentActivity() {
                             manager.launchReviewFlow(this, reviewInfo)
                         }
                     }
-                    val navController = rememberNavController()
-                    val currentRoute by navController.currentBackStackEntryAsState()
+
+                    val navigationState = rememberNavigationState(
+                        startRoute = Screen.CalculatorScreen,
+                        topLevelRoutes = setOf(Screen.CalculatorScreen)
+                    )
+                    val navigator = remember { Navigator(navigationState) }
+
+                    val currentRoute =
+                        navigationState.backStacks[navigationState.topLevelRoute]?.last()
+                    
                     val routeToTitleAndIcon = mapOf(
-                        "calculator" to Pair(
+                        Screen.CalculatorScreen::class to Pair(
                             "Simple Calculator", Icons.Default.Home
                         ),
-                        "more" to Pair(
+                        Screen.MoreScreen::class to Pair(
                             "More Calculators",
                             Icons.AutoMirrored.Filled.ArrowBack
                         ),
-                        "sip" to Pair(
+                        Screen.SipScreen::class to Pair(
                             "SIP Calculator",
                             Icons.Default.KeyboardArrowDown
                         ),
-                        "bmi" to Pair(
+                        Screen.BmiScreen::class to Pair(
                             "BMI Calculator",
                             Icons.Default.KeyboardArrowDown
-                        ), "emi" to Pair(
+                        ), Screen.EmiScreen::class to Pair(
                             "EMI Calculator",
                             Icons.Default.KeyboardArrowDown
-                        ), "converter" to Pair(
+                        ), Screen.ConverterScreen::class to Pair(
                             "Converter tools",
                             Icons.AutoMirrored.Filled.ArrowBack
                         )
-                        // Add more routes as needed
                     )
+
                     val windowAdaptiveInfo = currentWindowAdaptiveInfo()
                     val isLandscape = with(windowAdaptiveInfo) {
                         if (windowSizeClass.minWidth == WindowSizeClass.WidthSizeClasses.Compact) {
@@ -167,13 +175,13 @@ class MainActivity : ComponentActivity() {
                     Scaffold(topBar = {
                         AnimatedVisibility(!isLandscape) {
                             MyAppBar(
-                                currentRoute?.destination?.route,
-                                navController,
+                                currentRoute,
+                                navigator,
                                 routeToTitleAndIcon
                             )
                         }
                     }, modifier = Modifier.safeDrawingPadding()) {
-                        navHost(navController, it)
+                        NavHost(navigator, it)
                     }
 
                 }
@@ -203,11 +211,11 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAppBar(
-    currentRoute: String?,
-    navController: NavController,
-    routeToTitleAndIcon: Map<String, Pair<String, ImageVector>>
+    currentRoute: NavKey?,
+    navigator: Navigator,
+    routeToTitleAndIcon: Map<out kotlin.reflect.KClass<out Screen>, Pair<String, ImageVector>>
 ) {
-    val (title, icon) = routeToTitleAndIcon[currentRoute] ?: return
+    val (title, icon) = routeToTitleAndIcon[currentRoute?.let { it::class }] ?: return
 
     TopAppBar(
         title = {
@@ -219,22 +227,19 @@ fun MyAppBar(
             )
         },
         navigationIcon = {
-            if (!currentRoute.equals(Screen.CalculatorScreen.route)) {
+            if (currentRoute != Screen.CalculatorScreen) {
                 IconButton(
-                    onClick = { navController.popBackStack() }
+                    onClick = { navigator.goBack() }
                 ) {
                     Icon(icon, contentDescription = "Back")
                 }
             }
         },
         actions = {
-            if (currentRoute.equals(Screen.CalculatorScreen.route)) {
+            if (currentRoute == Screen.CalculatorScreen) {
                 IconButton(
                     onClick = {
-                        navController.navigate(Screen.MoreScreen.route) {
-                            launchSingleTop = true
-                            popUpTo(Screen.CalculatorScreen.route)
-                        }
+                        navigator.navigate(Screen.MoreScreen)
                     }
                 ) {
                     Icon(painterResource(R.drawable.more2), contentDescription = "more")
@@ -246,4 +251,3 @@ fun MyAppBar(
         )
     )
 }
-

@@ -1,14 +1,9 @@
 package com.plus.calculatorplus.presentation.navigation
 
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.plus.calculatorplus.presentation.ui.BmiScreenMain
 import com.plus.calculatorplus.presentation.ui.CalculatorMain
 import com.plus.calculatorplus.presentation.ui.ConvertersScreenMain
@@ -17,140 +12,41 @@ import com.plus.calculatorplus.presentation.ui.MoreServices
 import com.plus.calculatorplus.presentation.ui.SipScreenMain
 
 @Composable
-fun navHost(
-    navController: NavHostController,
+fun NavHost3(
+    navigator: Navigator,
     paddingValues: PaddingValues
 ) {
-    NavHost(
-        navController = navController, startDestination = Screen.CalculatorScreen.route
-    ) {
-        composable(Screen.CalculatorScreen.route, enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(500)
-            )
-        }, exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(durationMillis = 500)
-            )
-        }, popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(500)
-            )
-        }, popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(500)
-            )
-        }) {
-            CalculatorMain(paddingValues)
-        }
-        composable(Screen.MoreScreen.route, enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(500)
-            )
-        }, exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(durationMillis = 500)
-            )
-        }, popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(500)
-            )
-        }, popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(500)
-            )
-        }) {
-            MoreServices(navController, paddingValues)
-        }
-
-        composable(Screen.SipScreen.route, enterTransition = {
-            slideInVertically(
-                initialOffsetY = { it }, animationSpec = tween(500)
-            )
-        }, exitTransition = {
-            slideOutVertically(
-                targetOffsetY = { it }, animationSpec = tween( 500)
-            )
-        }, popEnterTransition = {
-            slideInVertically(
-                initialOffsetY = { it }, animationSpec = tween(500)
-            )
-        }, popExitTransition = {
-            slideOutVertically(
-                targetOffsetY = { it }, animationSpec = tween(  500)
-            )
-        }) {
-
-            SipScreenMain(paddingValues)
-        }
-
-        composable(Screen.BmiScreen.route, enterTransition = {
-            slideInVertically(
-                initialOffsetY = { it }, animationSpec = tween(500)
-            )
-        }, exitTransition = {
-            slideOutVertically(
-                targetOffsetY = { it }, animationSpec = tween( 500)
-            )
-        }, popEnterTransition = {
-            slideInVertically(
-                initialOffsetY = { it }, animationSpec = tween(500)
-            )
-        }, popExitTransition = {
-            slideOutVertically(
-                targetOffsetY = { it }, animationSpec = tween(  500)
-            )
-        }) {
-            BmiScreenMain(paddingValues)
-        }
-
-        composable(Screen.ConverterScreen.route, enterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(500)
-            )
-        }, exitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(durationMillis = 500)
-            )
-        }, popEnterTransition = {
-            slideIntoContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(500)
-            )
-        }, popExitTransition = {
-            slideOutOfContainer(
-                AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(500)
-            )
-        }
-        ){
-            ConvertersScreenMain()
-        }
-
-        composable(Screen.EmiScreen.route
-            , enterTransition = {
-                slideInVertically(
-                    initialOffsetY = { it }, animationSpec = tween(500)
-                )
-            }, exitTransition = {
-                slideOutVertically(
-                    targetOffsetY = { it }, animationSpec = tween( 500)
-                )
-            }, popEnterTransition = {
-                slideInVertically(
-                    initialOffsetY = { it }, animationSpec = tween(500)
-                )
-            }, popExitTransition = {
-                slideOutVertically(
-                    targetOffsetY = { it }, animationSpec = tween(  500)
-                )
+    NavDisplay(
+        entries = navigator.state.toEntries(entryProvider {
+            entry<Screen.CalculatorScreen> {
+                CalculatorMain(paddingValues)
             }
-        ){
-            EmiScreenMain(paddingValues)
-        }
+            entry<Screen.MoreScreen> {
+                MoreServices(navigator, paddingValues)
+            }
+            entry<Screen.SipScreen> {
+                SipScreenMain(paddingValues)
+            }
+            entry<Screen.BmiScreen> {
+                BmiScreenMain(paddingValues)
+            }
+            entry<Screen.ConverterScreen> {
+                ConvertersScreenMain()
+            }
+            entry<Screen.EmiScreen> {
+                EmiScreenMain(paddingValues)
+            }
+        }),
+        onBack = { navigator.goBack() }
+    )
+}
 
-
-    }
-
+// Keeping a version for compatibility or to satisfy grep if needed,
+// but we should eventually replace its usage in MainActivity.
+@Composable
+fun NavHost(
+    navigator: Navigator,
+    paddingValues: PaddingValues
+) {
+    NavHost3(navigator, paddingValues)
 }

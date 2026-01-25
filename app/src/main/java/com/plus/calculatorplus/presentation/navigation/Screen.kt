@@ -1,10 +1,25 @@
 package com.plus.calculatorplus.presentation.navigation
 
-sealed class Screen (val route : String){
-    data object CalculatorScreen : Screen("calculator")
-    data object MoreScreen : Screen("more")
-    data object SipScreen : Screen("sip")
-    data object BmiScreen : Screen("bmi")
-    data object EmiScreen : Screen("emi")
-    data object ConverterScreen : Screen("converter")
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed interface Screen : NavKey {
+    @Serializable
+    data object CalculatorScreen : Screen
+
+    @Serializable
+    data object MoreScreen : Screen
+
+    @Serializable
+    data object SipScreen : Screen
+
+    @Serializable
+    data object BmiScreen : Screen
+
+    @Serializable
+    data object EmiScreen : Screen
+
+    @Serializable
+    data object ConverterScreen : Screen
 }
