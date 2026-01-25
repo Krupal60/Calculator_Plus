@@ -257,7 +257,11 @@ fun MyAppBar(
                         navigator.navigate(Screen.MoreScreen)
                     }
                 ) {
-                    Icon(painterResource(R.drawable.more2), contentDescription = "more")
+                    Icon(
+                        painterResource(R.drawable.more2),
+                        contentDescription = "more",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
             }
         },
