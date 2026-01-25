@@ -11,6 +11,7 @@ import com.plus.calculatorplus.presentation.ui.DiscountScreenMain
 import com.plus.calculatorplus.presentation.ui.EmiScreenMain
 import com.plus.calculatorplus.presentation.ui.FdScreenMain
 import com.plus.calculatorplus.presentation.ui.MoreServices
+import com.plus.calculatorplus.presentation.ui.RetirementScreenMain
 import com.plus.calculatorplus.presentation.ui.SipScreenMain
 import com.plus.calculatorplus.presentation.ui.SwpScreenMain
 
@@ -47,6 +48,9 @@ fun NavHost3(
             }
             entry<Screen.SwpScreen> {
                 SwpScreenMain(paddingValues)
+            }
+            entry<Screen.RetirementScreen> {
+                RetirementScreenMain(paddingValues)
             }
         }),
         onBack = { navigator.goBack() }

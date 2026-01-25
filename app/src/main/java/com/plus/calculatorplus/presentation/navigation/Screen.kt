@@ -31,4 +31,7 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object SwpScreen : Screen
+
+    @Serializable
+    data object RetirementScreen : Screen
 }

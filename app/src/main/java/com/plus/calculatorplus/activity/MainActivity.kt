@@ -162,6 +162,9 @@ class MainActivity : ComponentActivity() {
                         ), Screen.SwpScreen::class to Pair(
                             "SWP Calculator",
                             Icons.Default.KeyboardArrowDown
+                        ), Screen.RetirementScreen::class to Pair(
+                            "Retirement Calculator",
+                            Icons.Default.KeyboardArrowDown
                         )
                     )
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -120,6 +121,29 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
                 onClick = {
                     navigator.navigate(Screen.SwpScreen)
                 })
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.sdp),
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+            Alignment.CenterVertically
+        ) {
+            CustomCard(
+                backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp),
+                icon = R.drawable.retirement,
+                title = "Retirement",
+                onClick = {
+                    navigator.navigate(Screen.RetirementScreen)
+                })
+
+            Spacer(modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 10.dp))
         }
 
     }
