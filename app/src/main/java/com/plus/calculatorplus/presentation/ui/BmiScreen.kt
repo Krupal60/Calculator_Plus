@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,9 +62,9 @@ fun BmiScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
 
-    val age = remember { mutableStateOf("18") }
-    val weight = remember { mutableStateOf("50") }
-    val cm = remember { mutableStateOf("50") }
+    var age by rememberSaveable { mutableStateOf("18") }
+    var weight by rememberSaveable { mutableStateOf("50") }
+    var cm by rememberSaveable { mutableStateOf("50") }
 
     Column(
         Modifier
@@ -111,7 +112,7 @@ fun BmiScreen(
             )
         }
         HeightSliderWithText(
-            onValueChange = { cm.value = it },
+            onValueChange = { cm = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -119,7 +120,7 @@ fun BmiScreen(
             startNumber = 50,
             endNumber = 280,
             actionType = ImeAction.Done,
-            isError = !cmValidation(cm.value).first
+            isError = !cmValidation(cm).first
         )
 
         Row(
@@ -132,13 +133,13 @@ fun BmiScreen(
         ) {
             CustomCard2(
                 Modifier.weight(1f),
-                "Weight", "Kg", !weightValidation(weight.value).first, "50",
-                onValueChange = { weight.value = it }
+                "Weight", "Kg", !weightValidation(weight).first, "50",
+                onValueChange = { weight = it }
             )
             CustomCard2(
                 Modifier.weight(1f),
-                "Age", "Years", !ageValidate(age.value).first, "18",
-                onValueChange = { age.value = it }
+                "Age", "Years", !ageValidate(age).first, "18",
+                onValueChange = { age = it }
             )
         }
 
@@ -148,17 +149,17 @@ fun BmiScreen(
             onClick = {
                 when (
                     bmiValidation(
-                        age = age.value,
-                        weight = weight.value,
-                        cm = cm.value
+                        age = age,
+                        weight = weight,
+                        cm = cm
                     ).first
                 ) {
                     true -> {
                         onAction(
                             OnBmiAction.CalculateBmi(
-                                age.value,
-                                cm.value,
-                                weight.value,
+                                age,
+                                cm,
+                                weight,
                                 isMale
                             )
                         )
@@ -171,9 +172,9 @@ fun BmiScreen(
                         Toast.makeText(
                             Calculator.calculator,
                             bmiValidation(
-                                age = age.value,
-                                weight = weight.value,
-                                cm = cm.value
+                                age = age,
+                                weight = weight,
+                                cm = cm
                             ).second,
                             Toast.LENGTH_SHORT
                         ).show()

@@ -21,8 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,11 +61,11 @@ fun SipScreen(
     state: State<SipDetailState>,
     onAction: (OnSipAction) -> Unit
 ) {
-    val monthlyInvestment = remember { mutableStateOf("100") }
-    val lumsumInvestment = remember { mutableStateOf("6") }
-    val interestRate = remember { mutableStateOf("12") }
-    val investmentYears = remember { mutableStateOf("5") }
-    var lumSum by remember { mutableStateOf(false) }
+    var monthlyInvestment by rememberSaveable { mutableStateOf("100") }
+    var lumsumInvestment by rememberSaveable { mutableStateOf("500") }
+    var interestRate by rememberSaveable { mutableStateOf("12") }
+    var investmentYears by rememberSaveable { mutableStateOf("5") }
+    var lumSum by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
 
@@ -112,11 +112,11 @@ fun SipScreen(
             SliderWithText(
                 "Monthly Amount  (in Rs.)",
                 100, 800000,
-                onValueChange = { monthlyInvestment.value = it },
+                onValueChange = { monthlyInvestment = it },
                 actionType = ImeAction.Done,
                 prefix = "₹",
                 suffix = "",
-                isError = !monthlyValidation(monthlyAmount = monthlyInvestment.value).first,
+                isError = !monthlyValidation(monthlyAmount = monthlyInvestment).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
         }
@@ -124,11 +124,11 @@ fun SipScreen(
             SliderWithText(
                 "Lumsum Amount (in Rs.)",
                 500, 1000000,
-                onValueChange = { lumsumInvestment.value = it },
+                onValueChange = { lumsumInvestment = it },
                 actionType = ImeAction.Done,
                 prefix = "₹",
                 suffix = "",
-                isError = !lumsumValidation(lumSum, lumsumInvestment.value).first,
+                isError = !lumsumValidation(lumSum, lumsumInvestment).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
         }
@@ -136,31 +136,31 @@ fun SipScreen(
         SliderWithText(
             "Interest Rate  (Annual)",
             12, 45,
-            onValueChange = { interestRate.value = it },
+            onValueChange = { interestRate = it },
             actionType = ImeAction.Done,
             prefix = "",
             suffix = "%",
-            isError = !interestRateValidation(interestRate.value).first
+            isError = !interestRateValidation(interestRate).first
         )
         SliderWithText(
             "Investment Years",
             5,
             40,
-            onValueChange = { investmentYears.value = it },
+            onValueChange = { investmentYears = it },
             actionType = ImeAction.Done,
             prefix = "",
             suffix = "Yr",
-            isError = !yearsValidation(investmentYears.value).first
+            isError = !yearsValidation(investmentYears).first
         )
 
 
         Button(modifier = Modifier.fillMaxWidth(), onClick = {
             when (sipValidation(
                 lumSum,
-                monthlyInvestment.value,
-                lumsumInvestment.value,
-                interestRate.value,
-                investmentYears.value
+                monthlyInvestment,
+                lumsumInvestment,
+                interestRate,
+                investmentYears
             ).first
 
             ) {
@@ -168,10 +168,10 @@ fun SipScreen(
                     onAction(
                         OnSipAction.CalculateSip(
                             isLumsum = lumSum,
-                            monthlyAmount = monthlyInvestment.value,
-                            lumsumAmount = lumsumInvestment.value,
-                            interest = interestRate.value,
-                            investedYears = investmentYears.value
+                            monthlyAmount = monthlyInvestment,
+                            lumsumAmount = lumsumInvestment,
+                            interest = interestRate,
+                            investedYears = investmentYears
                         )
                     )
                     coroutineScope.launch {
@@ -184,10 +184,10 @@ fun SipScreen(
                     Toast.makeText(
                         Calculator.calculator, sipValidation(
                             lumSum,
-                            monthlyInvestment.value,
-                            lumsumInvestment.value,
-                            interestRate.value,
-                            investmentYears.value
+                            monthlyInvestment,
+                            lumsumInvestment,
+                            interestRate,
+                            investmentYears
                         ).second, Toast.LENGTH_SHORT
                     ).show()
                 }

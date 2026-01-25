@@ -18,9 +18,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -56,9 +58,9 @@ fun EmiScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
 
-    val loanAmount = remember { mutableStateOf("10000") }
-    val interestRate = remember { mutableStateOf("2") }
-    val loanYears = remember { mutableStateOf("1") }
+    var loanAmount by rememberSaveable { mutableStateOf("10000") }
+    var interestRate by rememberSaveable { mutableStateOf("2") }
+    var loanYears by rememberSaveable { mutableStateOf("1") }
 
     Column(
         Modifier
@@ -75,33 +77,33 @@ fun EmiScreen(
         SliderWithText(
             "loan Amount",
             10000, 10000000,
-            onValueChange = { loanAmount.value = it },
+            onValueChange = { loanAmount = it },
             actionType = ImeAction.Done,
             prefix = "₹",
             suffix = "",
-            isError = !loanAmountValidation(loanAmount.value).first,
+            isError = !loanAmountValidation(loanAmount).first,
             visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
         )
 
         SliderWithText(
             "Interest Rate (p.a)",
             4, 35,
-            onValueChange = { interestRate.value = it },
+            onValueChange = { interestRate = it },
             actionType = ImeAction.Done,
             prefix = "",
             suffix = "%",
-            isError = !loanInterestRateValidation(interestRate.value).first
+            isError = !loanInterestRateValidation(interestRate).first
         )
 
         SliderWithText(
             "loan Years",
             1,
             35,
-            onValueChange = { loanYears.value = it },
+            onValueChange = { loanYears = it },
             actionType = ImeAction.Done,
             prefix = "",
             suffix = "Yr",
-            isError = !yearsValidation(loanYears.value).first
+            isError = !yearsValidation(loanYears).first
         )
 
 
@@ -109,18 +111,18 @@ fun EmiScreen(
 
             when (
                 emiValidation(
-                    loanAmount.value,
-                    interestRate.value,
-                    loanYears.value
+                    loanAmount,
+                    interestRate,
+                    loanYears
                 ).first
 
             ) {
                 true -> {
                     onAction(
                         OnEmiAction.CalculateEmi(
-                            loanAmount = loanAmount.value,
-                            loanInterest = interestRate.value,
-                            loanYear = loanYears.value
+                            loanAmount = loanAmount,
+                            loanInterest = interestRate,
+                            loanYear = loanYears
                         )
                     )
                     coroutineScope.launch {
@@ -132,9 +134,9 @@ fun EmiScreen(
                 false -> {
                     Toast.makeText(
                         com.plus.calculatorplus.Calculator.calculator, emiValidation(
-                            loanAmount.value,
-                            interestRate.value,
-                            loanYears.value
+                            loanAmount,
+                            interestRate,
+                            loanYears
                         ).second, Toast.LENGTH_SHORT
                     ).show()
                 }

@@ -112,7 +112,7 @@ fun lumsumValidation(
 
         else -> {
             val lumsumAmountInt = lumsumAmount.toDouble()
-            if (lumsumAmountInt >= 100.0) {
+            if (lumsumAmountInt >= 500.0) {
                 Pair(true, "")
             } else {
                 Pair(false, "Lumsum Amount not less than 500 RS.")

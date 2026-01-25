@@ -44,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -120,8 +121,8 @@ fun SliderWithText(
     onValueChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-    var value by remember { mutableStateOf("$startNumber") }
-    var text by remember { mutableStateOf("$startNumber") }
+    var value by rememberSaveable { mutableStateOf("$startNumber") }
+    var text by rememberSaveable { mutableStateOf("$startNumber") }
     val focusManager = LocalFocusManager.current
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -217,7 +218,7 @@ fun CustomCard2(
     onValueChange: (String) -> Unit
 ) {
 
-    val value = remember {
+    var value by rememberSaveable {
         mutableStateOf(value)
     }
     val focusManager = LocalFocusManager.current
@@ -255,8 +256,8 @@ fun CustomCard2(
                 IconButton(
                     modifier = Modifier,
                     onClick = {
-                        value.value = (value.value.toInt() - 1).toString()
-                        onValueChange(value.value)
+                        value = (value.toInt() - 1).toString()
+                        onValueChange(value)
                     }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
@@ -264,8 +265,10 @@ fun CustomCard2(
                     )
                 }
                 OutlinedTextField(
-                    modifier = modifier.weight(1f), value = value.value, onValueChange = {
-                        value.value = it
+                    modifier = modifier.weight(1f),
+                    value = value,
+                    onValueChange = {
+                        value = it
                         onValueChange(it)
                     },
                     isError = isError, keyboardOptions = KeyboardOptions(
@@ -281,8 +284,8 @@ fun CustomCard2(
                 IconButton(
                     modifier = Modifier,
                     onClick = {
-                        value.value = (value.value.toInt() + 1).toString()
-                        onValueChange(value.value)
+                        value = (value.toInt() + 1).toString()
+                        onValueChange(value)
                     }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
@@ -320,13 +323,13 @@ fun HeightSliderWithText(
     isError: Boolean,
     onValueChange: (String) -> Unit
 ) {
-    var value by remember { mutableStateOf("150") }
-    var valueFt by remember { mutableStateOf("5") }
-    var valueIn by remember { mutableStateOf("0") }
-    var text by remember { mutableStateOf("150") }
-    var textFt by remember { mutableStateOf("5") }
-    var textIn by remember { mutableStateOf("0") }
-    var isCm by remember { mutableStateOf(false) }
+    var value by rememberSaveable { mutableStateOf("150") }
+    var valueFt by rememberSaveable { mutableStateOf("5") }
+    var valueIn by rememberSaveable { mutableStateOf("0") }
+    var text by rememberSaveable { mutableStateOf("150") }
+    var textFt by rememberSaveable { mutableStateOf("5") }
+    var textIn by rememberSaveable { mutableStateOf("0") }
+    var isCm by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
     // Logic moved from the bottom of the function to a LaunchedEffect
