@@ -153,6 +153,9 @@ class MainActivity : ComponentActivity() {
                         ), Screen.ConverterScreen::class to Pair(
                             "Converter tools",
                             Icons.AutoMirrored.Filled.ArrowBack
+                        ), Screen.DiscountScreen::class to Pair(
+                            "Discount Calculator",
+                            Icons.Default.KeyboardArrowDown
                         )
                     )
 

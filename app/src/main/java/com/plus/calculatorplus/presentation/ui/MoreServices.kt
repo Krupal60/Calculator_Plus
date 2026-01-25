@@ -49,6 +49,17 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
                 onClick = {
                     navigator.navigate(Screen.EmiScreen)
                 })
+
+            CustomCard(
+                backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp),
+                icon = R.drawable.percent_discount, // Using more2 as placeholder for Discount
+                title = "Discount",
+                onClick = {
+                    navigator.navigate(Screen.DiscountScreen)
+                })
         }
 
         Row(

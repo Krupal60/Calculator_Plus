@@ -7,6 +7,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.plus.calculatorplus.presentation.ui.BmiScreenMain
 import com.plus.calculatorplus.presentation.ui.CalculatorMain
 import com.plus.calculatorplus.presentation.ui.ConvertersScreenMain
+import com.plus.calculatorplus.presentation.ui.DiscountScreenMain
 import com.plus.calculatorplus.presentation.ui.EmiScreenMain
 import com.plus.calculatorplus.presentation.ui.MoreServices
 import com.plus.calculatorplus.presentation.ui.SipScreenMain
@@ -35,6 +36,9 @@ fun NavHost3(
             }
             entry<Screen.EmiScreen> {
                 EmiScreenMain(paddingValues)
+            }
+            entry<Screen.DiscountScreen> {
+                DiscountScreenMain(paddingValues)
             }
         }),
         onBack = { navigator.goBack() }
