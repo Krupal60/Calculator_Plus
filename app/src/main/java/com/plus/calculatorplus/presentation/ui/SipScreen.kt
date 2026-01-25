@@ -38,10 +38,12 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.PieChart
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
+import com.plus.calculatorplus.presentation.validation.inflationValidation
 import com.plus.calculatorplus.presentation.validation.interestRateValidation
 import com.plus.calculatorplus.presentation.validation.lumsumValidation
 import com.plus.calculatorplus.presentation.validation.monthlyValidation
 import com.plus.calculatorplus.presentation.validation.sipValidation
+import com.plus.calculatorplus.presentation.validation.stepUpValidation
 import com.plus.calculatorplus.presentation.validation.yearsValidation
 import com.plus.calculatorplus.viewmodel.SipViewModel
 import ir.kaaveh.sdpcompose.ssp
@@ -66,6 +68,10 @@ fun SipScreen(
     var interestRate by rememberSaveable { mutableStateOf("12") }
     var investmentYears by rememberSaveable { mutableStateOf("5") }
     var lumSum by rememberSaveable { mutableStateOf(false) }
+    var withInflation by rememberSaveable { mutableStateOf(false) }
+    var inflationRate by rememberSaveable { mutableStateOf("6") }
+    var withStepUp by rememberSaveable { mutableStateOf(false) }
+    var stepUpPercentage by rememberSaveable { mutableStateOf("5") }
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
 
@@ -100,6 +106,7 @@ fun SipScreen(
             CustomSelectionCard(
                 onClick = {
                     lumSum = true
+                    withStepUp = false
                 },
                 "Lumsum fund",
                 modifier = Modifier
@@ -108,6 +115,41 @@ fun SipScreen(
                 backgroundColor = if (lumSum) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface
             )
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, bottom = 10.dp),
+            horizontalArrangement = Arrangement.Absolute.SpaceBetween
+        ) {
+            CustomSelectionCard(
+                onClick = { withInflation = !withInflation },
+                "With Inflation",
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 10.dp),
+                backgroundColor = if (withInflation) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface
+            )
+            CustomSelectionCard(
+                onClick = {
+                    if (!lumSum) {
+                        withStepUp = !withStepUp
+                    } else {
+                        Toast.makeText(
+                            Calculator.calculator,
+                            "Step Up is Not Available For Lumsum",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                "Step up SIP",
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 10.dp),
+                backgroundColor = if (withStepUp) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface
+            )
+        }
+
         AnimatedVisibility(visible = !lumSum) {
             SliderWithText(
                 "Monthly Amount  (in Rs.)",
@@ -130,6 +172,30 @@ fun SipScreen(
                 suffix = "",
                 isError = !lumsumValidation(lumSum, lumsumInvestment).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
+            )
+        }
+
+        AnimatedVisibility(visible = withInflation) {
+            SliderWithText(
+                "Inflation Rate (Annual)",
+                1, 20,
+                onValueChange = { inflationRate = it },
+                actionType = ImeAction.Done,
+                prefix = "",
+                suffix = "%",
+                isError = !inflationValidation(inflationRate, withInflation).first
+            )
+        }
+
+        AnimatedVisibility(visible = withStepUp && !lumSum) {
+            SliderWithText(
+                "Step up Percentage",
+                1, 50,
+                onValueChange = { stepUpPercentage = it },
+                actionType = ImeAction.Done,
+                prefix = "",
+                suffix = "%",
+                isError = !stepUpValidation(stepUpPercentage, withStepUp).first
             )
         }
 
@@ -160,7 +226,11 @@ fun SipScreen(
                 monthlyInvestment,
                 lumsumInvestment,
                 interestRate,
-                investmentYears
+                investmentYears,
+                withInflation,
+                inflationRate,
+                withStepUp,
+                stepUpPercentage
             ).first
 
             ) {
@@ -171,7 +241,11 @@ fun SipScreen(
                             monthlyAmount = monthlyInvestment,
                             lumsumAmount = lumsumInvestment,
                             interest = interestRate,
-                            investedYears = investmentYears
+                            investedYears = investmentYears,
+                            withInflation = withInflation,
+                            inflationRate = inflationRate,
+                            withStepUp = withStepUp,
+                            stepUpPercentage = stepUpPercentage
                         )
                     )
                     coroutineScope.launch {
@@ -187,7 +261,11 @@ fun SipScreen(
                             monthlyInvestment,
                             lumsumInvestment,
                             interestRate,
-                            investmentYears
+                            investmentYears,
+                            withInflation,
+                            inflationRate,
+                            withStepUp,
+                            stepUpPercentage
                         ).second, Toast.LENGTH_SHORT
                     ).show()
                 }

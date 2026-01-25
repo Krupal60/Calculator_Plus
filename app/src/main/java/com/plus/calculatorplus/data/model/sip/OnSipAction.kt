@@ -6,7 +6,11 @@ sealed class OnSipAction {
         val monthlyAmount: String,
         val lumsumAmount: String,
         val interest: String,
-        val investedYears: String
+        val investedYears: String,
+        val withInflation: Boolean = false,
+        val inflationRate: String = "0",
+        val withStepUp: Boolean = false,
+        val stepUpPercentage: String = "0"
     ) : OnSipAction()
 
 }

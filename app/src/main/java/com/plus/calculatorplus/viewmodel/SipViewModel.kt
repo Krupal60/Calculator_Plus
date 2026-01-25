@@ -24,65 +24,112 @@ class SipViewModel : ViewModel() {
         val interest = action.interest
         val investedYears = action.investedYears
         when {
-            isLumsum -> calculatLumsum(
+            isLumsum -> calculateLumsum(
                 action.lumsumAmount,
                 interest,
                 investedYears,
+                action.withInflation,
+                action.inflationRate
             )
-            else -> calculateSip(monthlyAmount, interest, investedYears)
+
+            else -> calculateSip(
+                monthlyAmount,
+                interest,
+                investedYears,
+                action.withInflation,
+                action.inflationRate,
+                action.withStepUp,
+                action.stepUpPercentage
+            )
         }
     }
 
 
-    private fun calculatLumsum(
+    private fun calculateLumsum(
         lumsumAmount: String,
         interest: String,
-        investedYears: String
+        investedYears: String,
+        withInflation: Boolean,
+        inflationRate: String
     ) {
-        val lumsumInvestmentAmount = lumsumAmount.toDouble()
-        val initialInterestRate = interest.toDouble() / 100
-        val investmentYears = investedYears.toDouble()
+        val principal = lumsumAmount.toDouble()
+        val years = investedYears.toInt()
 
+        val nominalAnnualReturn = interest.toDouble() / 100
+        val inflation = inflationRate.toDouble() / 100
 
-        // Calculating accumulated amount using compound interest formula
-        val accumulatedAmount = lumsumInvestmentAmount * (1 + initialInterestRate).pow(
-            investmentYears
-        )
+        val effectiveAnnualReturn =
+            if (withInflation) {
+                ((1 + nominalAnnualReturn) / (1 + inflation)) - 1
+            } else {
+                nominalAnnualReturn
+            }
 
-        // Calculating estimated returns (interest earned)
-        val estimateReturn = accumulatedAmount - lumsumInvestmentAmount
+        val totalValue =
+            principal * (1 + effectiveAnnualReturn).pow(years.toDouble())
 
-        // Total invested amount
-        val totalInvestedAmount = lumsumInvestmentAmount
-
+        val estimatedReturn = totalValue - principal
 
         state.value = state.value.copy(
-            totalAmount = accumulatedAmount.roundToInt().toString(),
-            estimateReturnsAmount = estimateReturn.roundToInt().toString(),
-            investedAmount = totalInvestedAmount.roundToInt().toString()
+            totalAmount = totalValue.roundToInt().toString(),
+            estimateReturnsAmount = estimatedReturn.roundToInt().toString(),
+            investedAmount = principal.roundToInt().toString()
         )
     }
 
 
+    private fun calculateSip(
+        monthlyAmount: String,
+        interest: String,
+        investedYears: String,
+        withInflation: Boolean,
+        inflationRate: String,
+        withStepUp: Boolean,
+        stepUpPercentage: String
+    ) {
+        val baseMonthly = monthlyAmount.toDouble()
+        val years = investedYears.toInt()
+
+        val nominalAnnualReturn = interest.toDouble() / 100
+        val inflation = inflationRate.toDouble() / 100
+        val stepUp = stepUpPercentage.toDouble() / 100
+
+        // Inflation-adjusted (real) annual return
+        val effectiveAnnualReturn =
+            if (withInflation) {
+                ((1 + nominalAnnualReturn) / (1 + inflation)) - 1
+            } else {
+                nominalAnnualReturn
+            }
 
 
+        val monthlyRate =
+            (1 + effectiveAnnualReturn).pow(1.0 / 12) - 1
 
-    private fun calculateSip(monthlyAmount: String, interest: String, investedYears: String) {
-        val monthlyInvestmentAmount = monthlyAmount.toDouble()
-        val expectedReturnRate = interest.toDouble()
-        val investmentTimePeriod = investedYears.toDouble() * 12
-        val periodicInterest = ((expectedReturnRate.toFloat() / 12) / 100)
+        var totalValue = 0.0
+        var totalInvested = 0.0
+        var currentMonthlyAmount = baseMonthly
 
-        val totalInvestedAmount = monthlyInvestmentAmount * investmentTimePeriod
+        for (year in 1..years) {
 
-        val totalValue = monthlyInvestmentAmount * ((((1 + periodicInterest).toDouble()
-            .pow(investmentTimePeriod) - 1) / periodicInterest) * (1 + periodicInterest)).toLong()
-        val estimateReturn = totalValue - totalInvestedAmount
+            repeat(12) {
+                totalValue =
+                    (totalValue + currentMonthlyAmount) * (1 + monthlyRate)
+                totalInvested += currentMonthlyAmount
+            }
+
+            // Annual step-up
+            if (withStepUp) {
+                currentMonthlyAmount *= (1 + stepUp)
+            }
+        }
+
+        val estimatedReturn = totalValue - totalInvested
 
         state.value = state.value.copy(
             totalAmount = totalValue.roundToInt().toString(),
-            estimateReturnsAmount = estimateReturn.roundToInt().toString(),
-            investedAmount = totalInvestedAmount.roundToInt().toString()
+            estimateReturnsAmount = estimatedReturn.roundToInt().toString(),
+            investedAmount = totalInvested.roundToInt().toString()
         )
     }
 
