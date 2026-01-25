@@ -121,8 +121,8 @@ fun SliderWithText(
     onValueChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
-    var value by rememberSaveable { mutableStateOf("$startNumber") }
-    var text by rememberSaveable { mutableStateOf("$startNumber") }
+    var value by rememberSaveable(startNumber) { mutableStateOf("$startNumber") }
+    var text by rememberSaveable(startNumber) { mutableStateOf("$startNumber") }
     val focusManager = LocalFocusManager.current
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -218,7 +218,7 @@ fun CustomCard2(
     onValueChange: (String) -> Unit
 ) {
 
-    var value by rememberSaveable {
+    var value by rememberSaveable(value) {
         mutableStateOf(value)
     }
     val focusManager = LocalFocusManager.current
