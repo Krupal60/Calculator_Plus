@@ -12,6 +12,7 @@ import com.plus.calculatorplus.presentation.ui.EmiScreenMain
 import com.plus.calculatorplus.presentation.ui.FdScreenMain
 import com.plus.calculatorplus.presentation.ui.MoreServices
 import com.plus.calculatorplus.presentation.ui.SipScreenMain
+import com.plus.calculatorplus.presentation.ui.SwpScreenMain
 
 @Composable
 fun NavHost3(
@@ -43,6 +44,9 @@ fun NavHost3(
             }
             entry<Screen.FdScreen> {
                 FdScreenMain(paddingValues)
+            }
+            entry<Screen.SwpScreen> {
+                SwpScreenMain(paddingValues)
             }
         }),
         onBack = { navigator.goBack() }

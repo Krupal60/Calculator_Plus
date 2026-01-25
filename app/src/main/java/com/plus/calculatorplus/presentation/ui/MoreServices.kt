@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -105,15 +104,22 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 10.dp),
-                icon = R.drawable.fd,
+                icon = R.drawable.more,
                 title = "FD",
                 onClick = {
                     navigator.navigate(Screen.FdScreen)
                 })
 
-            Spacer(modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 10.dp))
+            CustomCard(
+                backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp),
+                icon = R.drawable.sip, // Using sip icon as placeholder for SWP
+                title = "SWP",
+                onClick = {
+                    navigator.navigate(Screen.SwpScreen)
+                })
         }
 
     }

@@ -159,6 +159,9 @@ class MainActivity : ComponentActivity() {
                         ), Screen.FdScreen::class to Pair(
                             "FD Calculator",
                             Icons.Default.KeyboardArrowDown
+                        ), Screen.SwpScreen::class to Pair(
+                            "SWP Calculator",
+                            Icons.Default.KeyboardArrowDown
                         )
                     )
 
