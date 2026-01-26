@@ -1,5 +1,6 @@
 package com.plus.calculatorplus.presentation.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,6 +23,7 @@ import ir.kaaveh.sdpcompose.sdp
 fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
     Column(
         Modifier
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(
                 top = paddingValues.calculateTopPadding() + 15.dp,

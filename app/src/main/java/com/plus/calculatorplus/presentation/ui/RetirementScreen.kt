@@ -1,6 +1,7 @@
 package com.plus.calculatorplus.presentation.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -67,6 +68,7 @@ fun RetirementScreen(
 
     Column(
         Modifier
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
             .padding(

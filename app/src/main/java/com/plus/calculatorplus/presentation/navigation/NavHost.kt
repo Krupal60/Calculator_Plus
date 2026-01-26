@@ -49,7 +49,7 @@ fun NavHost3(
             }
 
             entry<Screen.ConverterScreen>(metadata = verticalSlideTransition) {
-                ConvertersScreenMain()
+                ConvertersScreenMain(paddingValues)
             }
 
             entry<Screen.EmiScreen>(metadata = verticalSlideTransition) {
