@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,22 +28,22 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.plus.calculatorplus.Calculator
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.discountValidation
 import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,13 +55,16 @@ fun DiscountScreenMain(navigator: Navigator, viewModel: DiscountViewModel = view
         val state = viewModel.state.collectAsStateWithLifecycle()
         DiscountScreen(paddingValues, state, viewModel::onAction)
     }
+    val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is DiscountEffect.ShowToast -> {
-                    Toast.makeText(Calculator.calculator, effect.message, Toast.LENGTH_SHORT).show()
-                }
+    CollectEffect(viewModel.effect) { effect ->
+        when (effect) {
+            is DiscountEffect.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    effect.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -76,7 +78,7 @@ fun DiscountScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
-
+    val context = LocalContext.current
     var originalPrice by rememberSaveable { mutableStateOf("1000") }
     var discountPercentage by rememberSaveable { mutableStateOf("10") }
 
@@ -125,7 +127,7 @@ fun DiscountScreen(
                 )
                 coroutineScope.launch { scrollState.animateScrollTo(Int.MAX_VALUE) }
             } else {
-                Toast.makeText(Calculator.calculator, validationResult.second, Toast.LENGTH_SHORT)
+                Toast.makeText(context, validationResult.second, Toast.LENGTH_SHORT)
                     .show()
             }
         }) {

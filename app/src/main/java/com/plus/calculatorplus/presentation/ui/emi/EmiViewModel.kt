@@ -2,10 +2,10 @@ package com.plus.calculatorplus.presentation.ui.emi
 
 import androidx.lifecycle.ViewModel
 import com.plus.calculatorplus.domain.emi.EmiCalculationUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class EmiViewModel : ViewModel() {
 
@@ -14,8 +14,8 @@ class EmiViewModel : ViewModel() {
     var state = MutableStateFlow(EmiState())
         private set
 
-    private val _effect = MutableSharedFlow<EmiEffect>()
-    val effect: SharedFlow<EmiEffect> = _effect.asSharedFlow()
+    private val _effect = Channel<EmiEffect>(Channel.BUFFERED)
+    val effect: Flow<EmiEffect> = _effect.receiveAsFlow()
 
     fun onAction(action: EmiAction) {
         when (action) {

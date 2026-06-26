@@ -2,12 +2,12 @@ package com.plus.calculatorplus.presentation.ui.retirement
 
 import androidx.lifecycle.ViewModel
 import com.plus.calculatorplus.domain.retirement.RetirementCalculationUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class RetirementViewModel : ViewModel() {
 
@@ -16,8 +16,8 @@ class RetirementViewModel : ViewModel() {
     private val _state = MutableStateFlow(RetirementState())
     val state: StateFlow<RetirementState> = _state.asStateFlow()
 
-    private val _effect = MutableSharedFlow<RetirementEffect>()
-    val effect: SharedFlow<RetirementEffect> = _effect.asSharedFlow()
+    private val _effect = Channel<RetirementEffect>(Channel.BUFFERED)
+    val effect: Flow<RetirementEffect> = _effect.receiveAsFlow()
 
     fun onAction(action: RetirementAction) {
         when (action) {

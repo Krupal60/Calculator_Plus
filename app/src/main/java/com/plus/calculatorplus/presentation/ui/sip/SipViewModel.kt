@@ -2,10 +2,10 @@ package com.plus.calculatorplus.presentation.ui.sip
 
 import androidx.lifecycle.ViewModel
 import com.plus.calculatorplus.domain.sip.SipCalculationUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class SipViewModel : ViewModel() {
 
@@ -14,8 +14,8 @@ class SipViewModel : ViewModel() {
     var state = MutableStateFlow(SipState())
         private set
 
-    private val _effect = MutableSharedFlow<SipEffect>()
-    val effect: SharedFlow<SipEffect> = _effect.asSharedFlow()
+    private val _effect = Channel<SipEffect>(Channel.BUFFERED)
+    val effect: Flow<SipEffect> = _effect.receiveAsFlow()
 
     fun onAction(action: SipAction) {
         when (action) {

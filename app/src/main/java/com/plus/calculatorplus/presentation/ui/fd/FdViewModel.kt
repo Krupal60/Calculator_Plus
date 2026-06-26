@@ -2,12 +2,12 @@ package com.plus.calculatorplus.presentation.ui.fd
 
 import androidx.lifecycle.ViewModel
 import com.plus.calculatorplus.domain.fd.FdCalculationUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class FdViewModel : ViewModel() {
 
@@ -16,8 +16,8 @@ class FdViewModel : ViewModel() {
     private val _state = MutableStateFlow(FdState())
     val state: StateFlow<FdState> = _state.asStateFlow()
 
-    private val _effect = MutableSharedFlow<FdEffect>()
-    val effect: SharedFlow<FdEffect> = _effect.asSharedFlow()
+    private val _effect = Channel<FdEffect>(Channel.BUFFERED)
+    val effect: Flow<FdEffect> = _effect.receiveAsFlow()
 
     fun onAction(action: FdAction) {
         when (action) {

@@ -2,10 +2,10 @@ package com.plus.calculatorplus.presentation.ui.bmi
 
 import androidx.lifecycle.ViewModel
 import com.plus.calculatorplus.domain.bmi.BmiCalculationUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class BmiViewModel : ViewModel() {
 
@@ -14,8 +14,8 @@ class BmiViewModel : ViewModel() {
     var state = MutableStateFlow(BmiState())
         private set
 
-    private val _effect = MutableSharedFlow<BmiEffect>()
-    val effect: SharedFlow<BmiEffect> = _effect.asSharedFlow()
+    private val _effect = Channel<BmiEffect>(Channel.BUFFERED)
+    val effect: Flow<BmiEffect> = _effect.receiveAsFlow()
 
     fun onAction(action: BmiAction) {
         when (action) {

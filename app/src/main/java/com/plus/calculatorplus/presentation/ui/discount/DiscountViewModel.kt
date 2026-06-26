@@ -2,12 +2,12 @@ package com.plus.calculatorplus.presentation.ui.discount
 
 import androidx.lifecycle.ViewModel
 import com.plus.calculatorplus.domain.discount.DiscountCalculationUseCase
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class DiscountViewModel : ViewModel() {
 
@@ -16,8 +16,8 @@ class DiscountViewModel : ViewModel() {
     private val _state = MutableStateFlow(DiscountState())
     val state: StateFlow<DiscountState> = _state.asStateFlow()
 
-    private val _effect = MutableSharedFlow<DiscountEffect>()
-    val effect: SharedFlow<DiscountEffect> = _effect.asSharedFlow()
+    private val _effect = Channel<DiscountEffect>(Channel.BUFFERED)
+    val effect: Flow<DiscountEffect> = _effect.receiveAsFlow()
 
     fun onAction(action: DiscountAction) {
         when (action) {

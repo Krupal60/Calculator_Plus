@@ -19,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,17 +28,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.plus.calculatorplus.Calculator
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.emiValidation
@@ -47,7 +47,6 @@ import com.plus.calculatorplus.presentation.validation.loanAmountValidation
 import com.plus.calculatorplus.presentation.validation.loanInterestRateValidation
 import com.plus.calculatorplus.presentation.validation.yearsValidation
 import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -59,13 +58,15 @@ fun EmiScreenMain(navigator: Navigator, viewModel: EmiViewModel = viewModel()) {
         val state = viewModel.state.collectAsStateWithLifecycle()
         EmiScreen(paddingValues, state, viewModel::onAction)
     }
-
-    LaunchedEffect(Unit) {
-        viewModel.effect.collectLatest { effect ->
-            when (effect) {
-                is EmiEffect.ShowToast -> {
-                    Toast.makeText(Calculator.calculator, effect.message, Toast.LENGTH_SHORT).show()
-                }
+    val context = LocalContext.current
+    CollectEffect(viewModel.effect) { effect ->
+        when (effect) {
+            is EmiEffect.ShowToast -> {
+                Toast.makeText(
+                    context,
+                    effect.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -93,7 +94,7 @@ fun EmiScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
-
+    val context = LocalContext.current
     var loanAmount by rememberSaveable { mutableStateOf("10000") }
     var interestRate by rememberSaveable { mutableStateOf("2") }
     var loanYears by rememberSaveable { mutableStateOf("1") }
@@ -157,7 +158,7 @@ fun EmiScreen(
 
                 false -> {
                     Toast.makeText(
-                        Calculator.calculator,
+                        context,
                         emiValidation(loanAmount, interestRate, loanYears).second,
                         Toast.LENGTH_SHORT
                     ).show()
