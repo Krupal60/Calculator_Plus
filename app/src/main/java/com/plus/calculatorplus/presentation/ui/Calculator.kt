@@ -29,8 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -100,7 +102,7 @@ fun Calculator(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -148,22 +150,25 @@ fun DisplayCard(
 
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = if (isLandscape) Alignment.CenterEnd else Alignment.BottomEnd
+            contentAlignment = Alignment.BottomEnd
         ) {
             Text(
                 text = displayText,
-                textAlign = TextAlign.End,
-                autoSize = TextAutoSize.StepBased(
-                    minFontSize = 14.sp,
-                    maxFontSize = if (isLandscape) 60.sp else 80.sp,
-                    stepSize = 2.sp
+                style = MaterialTheme.typography.displayLarge.copy(
+                    textAlign = TextAlign.End,
+                    lineHeight = 1.1.em,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 ),
-                style = MaterialTheme.typography.bodyLarge,
+                autoSize = TextAutoSize.StepBased(
+                    minFontSize = 32.sp,
+                    maxFontSize = if (isLandscape) 60.sp else 80.sp,
+                    stepSize = 1.sp
+                ),
+                overflow = TextOverflow.MiddleEllipsis,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = if (isLandscape) 8.dp else 32.dp),
-                color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.Medium
+                    .padding(horizontal = 24.dp, vertical = 24.dp),
             )
         }
     }

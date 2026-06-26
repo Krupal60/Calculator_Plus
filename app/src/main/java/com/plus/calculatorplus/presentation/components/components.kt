@@ -112,7 +112,8 @@ fun CalculatorButton(
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.inverseOnSurface
+            color = MaterialTheme.colorScheme.inverseOnSurface,
+            maxLines = 1
         )
     }
 }
