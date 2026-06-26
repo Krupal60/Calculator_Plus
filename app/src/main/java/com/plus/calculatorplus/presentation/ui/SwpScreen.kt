@@ -16,17 +16,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,17 +38,25 @@ import com.plus.calculatorplus.Calculator
 import com.plus.calculatorplus.data.model.swp.OnSwpAction
 import com.plus.calculatorplus.data.model.swp.SwpDetailState
 import com.plus.calculatorplus.presentation.components.CustomText
+import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
+import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.swpValidation
+import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.viewmodel.SwpViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun SwpScreenMain(paddingValues: PaddingValues, viewModel: SwpViewModel = viewModel()) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    SwpScreen(paddingValues, state, viewModel::onAction)
+fun SwpScreenMain(navigator: Navigator, viewModel: SwpViewModel = viewModel()) {
+    ScreenScaffold(
+        title = "SWP Calculator",
+        showBack = true,
+        onBack = { navigator.goBack() }) { paddingValues ->
+        val state = viewModel.state.collectAsStateWithLifecycle()
+        SwpScreen(paddingValues, state, viewModel::onAction)
+    }
 }
 
 @Composable
@@ -216,6 +227,21 @@ fun SwpScreen(
                     Text(text = getMoneyInWords(state.value.finalValue.toDouble()))
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SwpScreenPreview() {
+    CalculatorPlusTheme {
+        Surface {
+            val state = remember { mutableStateOf(SwpDetailState()) }
+            SwpScreen(
+                paddingValues = PaddingValues(0.dp),
+                state = state,
+                onAction = {}
+            )
         }
     }
 }

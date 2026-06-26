@@ -16,17 +16,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,20 +38,25 @@ import com.plus.calculatorplus.Calculator
 import com.plus.calculatorplus.data.model.retirement.OnRetirementAction
 import com.plus.calculatorplus.data.model.retirement.RetirementDetailState
 import com.plus.calculatorplus.presentation.components.CustomText
+import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
+import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.retirementValidation
+import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.viewmodel.RetirementViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun RetirementScreenMain(
-    paddingValues: PaddingValues,
-    viewModel: RetirementViewModel = viewModel()
-) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    RetirementScreen(paddingValues, state, viewModel::onAction)
+fun RetirementScreenMain(navigator: Navigator, viewModel: RetirementViewModel = viewModel()) {
+    ScreenScaffold(
+        title = "Retirement Calculator",
+        showBack = true,
+        onBack = { navigator.goBack() }) { paddingValues ->
+        val state = viewModel.state.collectAsStateWithLifecycle()
+        RetirementScreen(paddingValues, state, viewModel::onAction)
+    }
 }
 
 @Composable
@@ -232,6 +240,21 @@ fun RetirementScreen(
                     Text(text = getMoneyInWords(state.value.estimatedReturns.toDouble()))
                 }
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RetirementScreenPreview() {
+    CalculatorPlusTheme {
+        Surface {
+            val state = remember { mutableStateOf(RetirementDetailState()) }
+            RetirementScreen(
+                paddingValues = PaddingValues(0.dp),
+                state = state,
+                onAction = {}
+            )
         }
     }
 }

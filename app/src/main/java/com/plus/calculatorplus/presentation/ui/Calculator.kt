@@ -41,15 +41,18 @@ import com.plus.calculatorplus.data.model.calculator.CalculatorAction
 import com.plus.calculatorplus.data.model.calculator.CalculatorOperation
 import com.plus.calculatorplus.data.model.calculator.CalculatorState
 import com.plus.calculatorplus.presentation.components.CalculatorButton
+import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.ui.theme.orange
 import com.plus.calculatorplus.viewmodel.CalculationViewModel
 
 
 @Composable
-fun CalculatorMain(paddingValues: PaddingValues, viewModel: CalculationViewModel = viewModel()) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    Calculator(state, viewModel::onAction, paddingValues)
+fun CalculatorMain(viewModel: CalculationViewModel = viewModel()) {
+    ScreenScaffold(title = "Simple Calculator") { innerPadding ->
+        val state = viewModel.state.collectAsStateWithLifecycle()
+        Calculator(state, viewModel::onAction, innerPadding)
+    }
 }
 
 

@@ -8,7 +8,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -30,66 +29,61 @@ import com.plus.calculatorplus.presentation.ui.SwpScreenMain
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun NavHost3(
-    navigator: Navigator,
-    paddingValues: PaddingValues
+fun NavHost(
+    navigator: Navigator
 ) {
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
 
     NavDisplay(
         entries = navigator.state.toEntries(entryProvider {
 
-            // Main Calculator: No metadata, stays as a single panel
             entry<Screen.CalculatorScreen> {
-                CalculatorMain(paddingValues)
+                CalculatorMain()
             }
 
-            // MoreServices: Acts as the List Pane for the tools section
             entry<Screen.MoreScreen>(metadata = ListDetailSceneStrategy.listPane()) {
-                MoreServices(navigator, paddingValues)
+                MoreServices(navigator)
             }
 
-            // All specific tools: Act as Detail Panes
             entry<Screen.SipScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                SipScreenMain(paddingValues)
+                SipScreenMain(navigator)
             }
 
             entry<Screen.BmiScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                BmiScreenMain(paddingValues)
+                BmiScreenMain(navigator)
             }
 
             entry<Screen.ConverterScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                ConvertersScreenMain(paddingValues)
+                ConvertersScreenMain(navigator)
             }
 
             entry<Screen.EmiScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                EmiScreenMain(paddingValues)
+                EmiScreenMain(navigator)
             }
 
             entry<Screen.DiscountScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                DiscountScreenMain(paddingValues)
+                DiscountScreenMain(navigator)
             }
 
             entry<Screen.FdScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                FdScreenMain(paddingValues)
+                FdScreenMain(navigator)
             }
 
             entry<Screen.SwpScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                SwpScreenMain(paddingValues)
+                SwpScreenMain(navigator)
             }
 
             entry<Screen.RetirementScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                RetirementScreenMain(paddingValues)
+                RetirementScreenMain(navigator)
             }
 
             entry<Screen.DividendScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
-                DividendScreenMain(paddingValues)
+                DividendScreenMain(navigator)
             }
 
         }),
         onBack = { navigator.goBack() },
         sceneStrategies = listOf(listDetailStrategy),
-        // Global default transitions
         transitionSpec = {
             slideInHorizontally { it } togetherWith
                       slideOutHorizontally { -it }
@@ -103,14 +97,6 @@ fun NavHost3(
                       slideOutHorizontally { it }
         }
     )
-}
-
-@Composable
-fun NavHost(
-    navigator: Navigator,
-    paddingValues: PaddingValues
-) {
-    NavHost3(navigator, paddingValues)
 }
 
 private val verticalSlideTransition =

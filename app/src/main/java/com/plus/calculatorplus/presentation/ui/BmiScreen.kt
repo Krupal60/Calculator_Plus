@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,18 +40,26 @@ import com.plus.calculatorplus.presentation.components.CustomCard
 import com.plus.calculatorplus.presentation.components.CustomCard2
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.HeightSliderWithText
+import com.plus.calculatorplus.presentation.components.ScreenScaffold
+import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.validation.ageValidate
 import com.plus.calculatorplus.presentation.validation.bmiValidation
 import com.plus.calculatorplus.presentation.validation.cmValidation
 import com.plus.calculatorplus.presentation.validation.weightValidation
+import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.viewmodel.BmiViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun BmiScreenMain(paddingValues: PaddingValues,viewModel : BmiViewModel = viewModel()) {
-    val state = viewModel.state.collectAsStateWithLifecycle()
-    BmiScreen(paddingValues,state,viewModel::onAction)
+fun BmiScreenMain(navigator: Navigator, viewModel: BmiViewModel = viewModel()) {
+    ScreenScaffold(
+        title = "BMI Calculator",
+        showBack = true,
+        onBack = { navigator.goBack() }) { paddingValues ->
+        val state = viewModel.state.collectAsStateWithLifecycle()
+        BmiScreen(paddingValues, state, viewModel::onAction)
+    }
 }
 
 
@@ -192,5 +202,20 @@ fun BmiScreen(
 
         }
         BmiResultCard(modifier = Modifier.fillMaxWidth(), state.value)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BmiScreenPreview() {
+    CalculatorPlusTheme {
+        Surface {
+            val state = remember { mutableStateOf(BmiDetailState()) }
+            BmiScreen(
+                paddingValues = PaddingValues(0.dp),
+                state = state,
+                onAction = {}
+            )
+        }
     }
 }
