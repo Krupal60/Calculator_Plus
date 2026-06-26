@@ -13,9 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,13 +27,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.WideNavigationRailDefaults
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,8 +54,8 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.plus.calculatorplus.R
 import com.plus.calculatorplus.presentation.navigation.NavHost
+import com.plus.calculatorplus.presentation.navigation.NavigationState
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
 import com.plus.calculatorplus.presentation.navigation.rememberNavigationState
@@ -126,7 +130,7 @@ class MainActivity : ComponentActivity() {
 
                     val navigationState = rememberNavigationState(
                         startRoute = Screen.CalculatorScreen,
-                        topLevelRoutes = setOf(Screen.CalculatorScreen)
+                        topLevelRoutes = setOf(Screen.CalculatorScreen, Screen.MoreScreen)
                     )
                     val navigator = remember { Navigator(navigationState) }
 
@@ -188,16 +192,56 @@ class MainActivity : ComponentActivity() {
                             false
                         }
                     }
-                    Scaffold(topBar = {
-                        AnimatedVisibility(!isLandscape) {
-                            MyAppBar(
-                                currentRoute,
-                                navigator,
-                                routeToTitleAndIcon
-                            )
+
+                    fun navigationSuiteType(adaptiveInfo: WindowAdaptiveInfo): NavigationSuiteType {
+                        return with(adaptiveInfo) {
+                            if (windowPosture.isTabletop || windowSizeClass.minHeight == WindowSizeClass.HeightSizeClasses.Compact) {
+                                NavigationSuiteType.NavigationRail
+                            } else if (windowSizeClass.minWidth >= WindowSizeClass.WidthSizeClasses.Expanded || windowSizeClass.minWidth == WindowSizeClass.WidthSizeClasses.Medium) {
+                                NavigationSuiteType.WideNavigationRailCollapsed
+                            } else {
+                                NavigationSuiteType.NavigationBar
+                            }
                         }
-                    }, modifier = Modifier.safeDrawingPadding()) {
-                        NavHost(navigator, it)
+                    }
+
+                    NavigationSuiteScaffold(
+                        layoutType = navigationSuiteType(windowAdaptiveInfo),
+                        navigationSuiteItems = {
+                            item(
+                                selected = navigationState.topLevelRoute == Screen.CalculatorScreen,
+                                onClick = { navigator.navigate(Screen.CalculatorScreen) },
+                                icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                                label = { Text("Calculator") }
+                            )
+                            item(
+                                selected = navigationState.topLevelRoute == Screen.MoreScreen,
+                                onClick = { navigator.navigate(Screen.MoreScreen) },
+                                icon = { Icon(Icons.Default.Apps, contentDescription = null) },
+                                label = { Text("Tools") }
+                            )
+                        },
+                        navigationSuiteColors = NavigationSuiteDefaults.colors(
+                            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
+                            shortNavigationBarContainerColor = MaterialTheme.colorScheme.surface,
+                            navigationRailContainerColor = MaterialTheme.colorScheme.surface,
+                            wideNavigationRailColors = WideNavigationRailDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
+                        )
+                    ) {
+                        Scaffold(topBar = {
+                            AnimatedVisibility(!isLandscape || currentRoute !in navigationState.backStacks.keys) {
+                                MyAppBar(
+                                    currentRoute,
+                                    navigator,
+                                    routeToTitleAndIcon,
+                                    navigationState
+                                )
+                            }
+                        }) {
+                            NavHost(navigator, it)
+                        }
                     }
 
                 }
@@ -229,7 +273,8 @@ class MainActivity : ComponentActivity() {
 fun MyAppBar(
     currentRoute: NavKey?,
     navigator: Navigator,
-    routeToTitleAndIcon: Map<out kotlin.reflect.KClass<out Screen>, Pair<String, ImageVector>>
+    routeToTitleAndIcon: Map<out kotlin.reflect.KClass<out Screen>, Pair<String, ImageVector>>,
+    navigationState: NavigationState
 ) {
     val (title, icon) = routeToTitleAndIcon[currentRoute?.let { it::class }] ?: return
 
@@ -243,7 +288,7 @@ fun MyAppBar(
             )
         },
         navigationIcon = {
-            if (currentRoute != Screen.CalculatorScreen) {
+            if (currentRoute !in navigationState.backStacks.keys) {
                 IconButton(
                     onClick = { navigator.goBack() }
                 ) {
@@ -252,19 +297,6 @@ fun MyAppBar(
             }
         },
         actions = {
-            if (currentRoute == Screen.CalculatorScreen) {
-                IconButton(
-                    onClick = {
-                        navigator.navigate(Screen.MoreScreen)
-                    }
-                ) {
-                    Icon(
-                        painterResource(R.drawable.more2),
-                        contentDescription = "more",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface

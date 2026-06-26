@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -76,7 +77,14 @@ import com.plus.calculatorplus.ui.theme.md_theme_dark_secondaryContainer
 import kotlin.math.roundToInt
 
 @Composable
-fun CalculatorButton(modifier: Modifier, text: String, color: Color, onClick: () -> Unit) {
+fun CalculatorButton(
+    modifier: Modifier,
+    text: String,
+    color: Color,
+    fontSize: TextUnit = 18.sp,
+    autoSize: TextAutoSize? = null,
+    onClick: () -> Unit
+) {
     Button(
         modifier = modifier
             .clickable {
@@ -84,7 +92,7 @@ fun CalculatorButton(modifier: Modifier, text: String, color: Color, onClick: ()
             },
         shapes = ButtonShapes(
             CircleShape,
-            RoundedCornerShape(12.dp)
+            RoundedCornerShape(24.dp)
         ),
         colors = ButtonColors(
             containerColor = color,
@@ -98,7 +106,8 @@ fun CalculatorButton(modifier: Modifier, text: String, color: Color, onClick: ()
     ) {
         Text(
             text = text,
-            fontSize = 18.sp,
+            fontSize = fontSize,
+            autoSize = autoSize,
             fontStyle = FontStyle.Normal,
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
