@@ -158,8 +158,7 @@ fun DisplayCard(
                     maxFontSize = if (isLandscape) 60.sp else 80.sp,
                     stepSize = 2.sp
                 ),
-                maxLines = 1,
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = if (isLandscape) 8.dp else 32.dp),
