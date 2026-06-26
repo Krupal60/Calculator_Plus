@@ -161,7 +161,7 @@ fun DisplayCard(
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 autoSize = TextAutoSize.StepBased(
-                    minFontSize = 32.sp,
+                    minFontSize = 22.sp,
                     maxFontSize = if (isLandscape) 60.sp else 80.sp,
                     stepSize = 1.sp
                 ),
