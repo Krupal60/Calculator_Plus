@@ -15,17 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import com.plus.calculatorplus.presentation.ui.BmiScreenMain
-import com.plus.calculatorplus.presentation.ui.CalculatorMain
-import com.plus.calculatorplus.presentation.ui.ConvertersScreenMain
-import com.plus.calculatorplus.presentation.ui.DiscountScreenMain
-import com.plus.calculatorplus.presentation.ui.DividendScreenMain
-import com.plus.calculatorplus.presentation.ui.EmiScreenMain
-import com.plus.calculatorplus.presentation.ui.FdScreenMain
-import com.plus.calculatorplus.presentation.ui.MoreServices
-import com.plus.calculatorplus.presentation.ui.RetirementScreenMain
-import com.plus.calculatorplus.presentation.ui.SipScreenMain
-import com.plus.calculatorplus.presentation.ui.SwpScreenMain
+import com.plus.calculatorplus.presentation.ui.bmi.BmiScreenMain
+import com.plus.calculatorplus.presentation.ui.calculator.CalculatorScreen
+import com.plus.calculatorplus.presentation.ui.converters.ConvertersScreenMain
+import com.plus.calculatorplus.presentation.ui.discount.DiscountScreenMain
+import com.plus.calculatorplus.presentation.ui.dividend.DividendScreenMain
+import com.plus.calculatorplus.presentation.ui.emi.EmiScreenMain
+import com.plus.calculatorplus.presentation.ui.fd.FdScreenMain
+import com.plus.calculatorplus.presentation.ui.more.MoreServicesScreen
+import com.plus.calculatorplus.presentation.ui.retirement.RetirementScreenMain
+import com.plus.calculatorplus.presentation.ui.sip.SipScreenMain
+import com.plus.calculatorplus.presentation.ui.swp.SwpScreenMain
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -38,11 +38,11 @@ fun NavHost(
         entries = navigator.state.toEntries(entryProvider {
 
             entry<Screen.CalculatorScreen> {
-                CalculatorMain()
+                CalculatorScreen()
             }
 
             entry<Screen.MoreScreen>(metadata = ListDetailSceneStrategy.listPane()) {
-                MoreServices(navigator)
+                MoreServicesScreen(navigator)
             }
 
             entry<Screen.SipScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {

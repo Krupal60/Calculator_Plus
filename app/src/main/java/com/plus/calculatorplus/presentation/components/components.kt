@@ -74,7 +74,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.plus.calculatorplus.data.model.bmi.BmiDetailState
+import com.plus.calculatorplus.presentation.ui.bmi.BmiState
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.ui.theme.md_theme_dark_inversePrimary
 import com.plus.calculatorplus.ui.theme.md_theme_dark_onSurface
@@ -871,7 +871,7 @@ fun CustomText(
 
 
 @Composable
-fun BmiResultCard(modifier: Modifier, state: BmiDetailState) {
+fun BmiResultCard(modifier: Modifier, state: BmiState) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(10.dp),

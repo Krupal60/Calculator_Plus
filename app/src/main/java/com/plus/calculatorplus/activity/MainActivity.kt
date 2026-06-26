@@ -43,12 +43,12 @@ import com.plus.calculatorplus.presentation.navigation.NavHost
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
 import com.plus.calculatorplus.presentation.navigation.rememberNavigationState
+import com.plus.calculatorplus.presentation.ui.splash.SplashViewModel
 import com.plus.calculatorplus.presentation.util.HeightSizeClasses
 import com.plus.calculatorplus.presentation.util.WidthSizeClasses
 import com.plus.calculatorplus.presentation.util.minHeight
 import com.plus.calculatorplus.presentation.util.minWidth
 import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
-import com.plus.calculatorplus.viewmodel.SplashScreenViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -73,11 +73,11 @@ class MainActivity : ComponentActivity() {
             SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
         )
         super.onCreate(savedInstanceState)
-        val viewModel: SplashScreenViewModel by viewModels()
+        val splashViewModel: SplashViewModel by viewModels()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.State.collect {
-                    splash.setKeepOnScreenCondition { it }
+                splashViewModel.state.collect {
+                    splash.setKeepOnScreenCondition { it.isLoading }
                 }
             }
         }
