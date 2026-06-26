@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.plus.calculatorplus"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.plus.calculatorplus"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 12
         versionName = "1.12"
 
