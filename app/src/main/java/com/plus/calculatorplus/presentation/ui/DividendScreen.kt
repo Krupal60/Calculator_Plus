@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.plus.calculatorplus.Calculator
@@ -39,7 +40,6 @@ import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformat
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.dividendValidation
 import com.plus.calculatorplus.viewmodel.DividendViewModel
-import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 @Composable
@@ -130,7 +130,7 @@ fun DividendScreen(
             CustomText(
                 modifier = Modifier.padding(vertical = 2.dp),
                 "Calculate",
-                14.ssp
+                14.sp
             )
         }
 

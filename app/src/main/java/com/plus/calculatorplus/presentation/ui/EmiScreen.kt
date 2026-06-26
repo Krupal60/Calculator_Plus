@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.plus.calculatorplus.data.model.emi.EmiDetailState
@@ -41,7 +42,6 @@ import com.plus.calculatorplus.presentation.validation.loanAmountValidation
 import com.plus.calculatorplus.presentation.validation.loanInterestRateValidation
 import com.plus.calculatorplus.presentation.validation.yearsValidation
 import com.plus.calculatorplus.viewmodel.EmiViewModel
-import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 @Composable
@@ -147,7 +147,7 @@ fun EmiScreen(
             CustomText(
                 modifier = Modifier.padding(vertical = 2.dp),
                 "Calculate",
-                14.ssp
+                14.sp
             )
         }
 

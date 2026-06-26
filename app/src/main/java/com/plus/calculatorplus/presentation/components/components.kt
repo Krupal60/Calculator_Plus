@@ -66,14 +66,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.plus.calculatorplus.data.model.bmi.BmiDetailState
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.ui.theme.md_theme_dark_inversePrimary
 import com.plus.calculatorplus.ui.theme.md_theme_dark_onSurface
 import com.plus.calculatorplus.ui.theme.md_theme_dark_primary
 import com.plus.calculatorplus.ui.theme.md_theme_dark_secondaryContainer
-import ir.kaaveh.sdpcompose.sdp
-import ir.kaaveh.sdpcompose.ssp
 import kotlin.math.roundToInt
 
 @Composable
@@ -99,7 +98,7 @@ fun CalculatorButton(modifier: Modifier, text: String, color: Color, onClick: ()
     ) {
         Text(
             text = text,
-            fontSize = 18.ssp,
+            fontSize = 18.sp,
             fontStyle = FontStyle.Normal,
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.Bold,
@@ -148,9 +147,9 @@ fun SliderWithText(
                     fontWeight = FontWeight.Normal,
                     fontFamily = FontFamily.Serif,
                     fontStyle = FontStyle.Normal,
-                    fontSize = 12.ssp,
+                    fontSize = 12.sp,
                     textAlign = TextAlign.Start,
-                    lineHeight = 18.ssp,
+                    lineHeight = 18.sp,
                     modifier = Modifier.fillMaxWidth(0.41f)
                 )
                 OutlinedTextField(
@@ -243,7 +242,7 @@ fun CustomCard2(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = text, fontSize = 12.ssp,
+                    text = text, fontSize = 12.sp,
                     fontStyle = FontStyle.Normal,
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.SemiBold
@@ -301,7 +300,7 @@ fun CustomCard2(
             ) {
                 Text(
                     text = endText,
-                    fontSize = 12.ssp,
+                    fontSize = 12.sp,
                     fontStyle = FontStyle.Normal,
                     fontFamily = FontFamily.Serif,
                     fontWeight = FontWeight.Normal
@@ -383,9 +382,9 @@ fun HeightSliderWithText(
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Serif,
                     fontStyle = FontStyle.Normal,
-                    fontSize = 16.ssp,
+                    fontSize = 16.sp,
                     textAlign = TextAlign.Start,
-                    lineHeight = 18.ssp,
+                    lineHeight = 18.sp,
                     modifier = Modifier.weight(1f)
                 )
                 Button(
@@ -613,14 +612,14 @@ fun CustomCard(
             Icon(
                 painter = painterResource(id = icon),
                 modifier = Modifier
-                    .size(55.sdp)
-                    .padding(top = 8.sdp),
+                    .size(55.dp)
+                    .padding(top = 8.dp),
                 contentDescription = title
             )
             Text(
                 text = title,
-                fontSize = 14.ssp,
-                modifier = Modifier.padding(vertical = 8.sdp),
+                fontSize = 14.sp,
+                modifier = Modifier.padding(vertical = 8.dp),
                 fontFamily = FontFamily.Serif
             )
         }
@@ -651,7 +650,7 @@ fun CustomSelectionCard(
             fontFamily = FontFamily.Serif,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
-            fontSize = 14.ssp,
+            fontSize = 14.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 10.dp, horizontal = 10.dp)
@@ -664,8 +663,8 @@ fun CustomSelectionCard(
 @Composable
 fun PieChart(
     data: Map<String, Long>,
-    radiusOuter: Dp = 60.sdp,
-    chartBarWidth: Dp = 20.sdp,
+    radiusOuter: Dp = 60.dp,
+    chartBarWidth: Dp = 20.dp,
     animDuration: Int = 1000,
 ) {
 
@@ -783,7 +782,7 @@ fun DetailsPieChart(
 @Composable
 fun DetailsPieChartItem(
     data: Pair<String, Long>,
-    height: Dp = 18.sdp,
+    height: Dp = 18.dp,
     color: Color
 ) {
     Surface(
@@ -817,13 +816,13 @@ fun DetailsPieChartItem(
                     modifier = Modifier.padding(start = 8.dp),
                     text = data.first,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 13.ssp
+                    fontSize = 13.sp
                 )
                 Text(
                     modifier = Modifier.padding(end = 8.dp),
                     text = getMoneyInWords(data.second.toDouble()),
                     fontWeight = FontWeight.Medium,
-                    fontSize = 13.ssp,
+                    fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -850,7 +849,7 @@ fun CustomText(
         fontStyle = FontStyle.Normal,
         fontSize = size,
         textAlign = TextAlign.Start,
-        lineHeight = 18.ssp
+        lineHeight = 18.sp
     )
 }
 
@@ -875,7 +874,7 @@ fun BmiResultCard(modifier: Modifier, state: BmiDetailState) {
                 fontFamily = FontFamily.Serif,
                 fontStyle = FontStyle.Normal,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.ssp,
+                fontSize = 16.sp,
                 modifier = Modifier.padding(top = 10.dp)
             )
             Row(
@@ -886,12 +885,12 @@ fun BmiResultCard(modifier: Modifier, state: BmiDetailState) {
             ) {
                 CustomText(
                     title = "BMI: ",
-                    size = 14.ssp,
+                    size = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
                 CustomText(
                     title = state.bmi,
-                    size = 14.ssp,
+                    size = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
 
@@ -907,16 +906,16 @@ fun BmiResultCard(modifier: Modifier, state: BmiDetailState) {
                     fontFamily = FontFamily.Serif,
                     fontStyle = FontStyle.Normal,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.ssp,
-                    lineHeight = 18.ssp
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp
                 )
                 Text(
                     text = state.interpretation,
                     fontFamily = FontFamily.Serif,
                     fontStyle = FontStyle.Normal,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.ssp,
-                    lineHeight = 18.ssp,
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp,
                     color = getColorBasedOnInterpretation(state.interpretation)
                 )
             }

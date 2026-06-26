@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.plus.calculatorplus.Calculator
@@ -47,7 +48,6 @@ import com.plus.calculatorplus.presentation.validation.sipValidation
 import com.plus.calculatorplus.presentation.validation.stepUpValidation
 import com.plus.calculatorplus.presentation.validation.yearsValidation
 import com.plus.calculatorplus.viewmodel.SipViewModel
-import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 
@@ -276,7 +276,7 @@ fun SipScreen(
             CustomText(
                 modifier = Modifier.padding(vertical = 2.dp),
                 "Calculate",
-               14.ssp
+                14.sp
             )
         }
         AnimatedVisibility(visible = state.value.estimateReturnsAmount.isNotEmpty()) {

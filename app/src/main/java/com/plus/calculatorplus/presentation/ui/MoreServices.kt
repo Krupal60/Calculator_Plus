@@ -17,7 +17,7 @@ import com.plus.calculatorplus.R
 import com.plus.calculatorplus.presentation.components.CustomCard
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
-import ir.kaaveh.sdpcompose.sdp
+
 
 @Composable
 fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
@@ -37,7 +37,7 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.sdp),
+                .padding(horizontal = 15.dp),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
             Alignment.CenterVertically
         ) {
@@ -67,7 +67,7 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.sdp),
+                .padding(horizontal = 15.dp),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
             Alignment.CenterVertically
         ) {
@@ -97,7 +97,7 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.sdp),
+                .padding(horizontal = 15.dp),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
             Alignment.CenterVertically
         ) {
@@ -127,7 +127,7 @@ fun MoreServices(navigator: Navigator, paddingValues: PaddingValues) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 15.sdp),
+                .padding(horizontal = 15.dp),
             horizontalArrangement = Arrangement.Absolute.SpaceBetween,
             Alignment.CenterVertically
         ) {

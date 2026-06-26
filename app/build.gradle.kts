@@ -61,7 +61,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.sdp)
     implementation(libs.androidx.viewmodel.compose)
     implementation(libs.androidx.livedata.ktx)
     implementation(libs.androidx.runtime.compose)

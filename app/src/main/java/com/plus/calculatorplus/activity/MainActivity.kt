@@ -27,7 +27,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -37,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -60,7 +61,6 @@ import com.plus.calculatorplus.presentation.util.minHeight
 import com.plus.calculatorplus.presentation.util.minWidth
 import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.viewmodel.SplashScreenViewModel
-import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -76,6 +76,7 @@ class MainActivity : ComponentActivity() {
                 ).show()
             }
         }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         appUpdateManager = AppUpdateManagerFactory.create(this)
         val splash = installSplashScreen()
@@ -131,7 +132,7 @@ class MainActivity : ComponentActivity() {
 
                     val currentRoute =
                         navigationState.backStacks[navigationState.topLevelRoute]?.last()
-                    
+
                     val routeToTitleAndIcon = mapOf(
                         Screen.CalculatorScreen::class to Pair(
                             "Simple Calculator", Icons.Default.Home
@@ -171,7 +172,7 @@ class MainActivity : ComponentActivity() {
                         )
                     )
 
-                    val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+                    val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
                     val isLandscape = with(windowAdaptiveInfo) {
                         if (windowSizeClass.minWidth == WindowSizeClass.WidthSizeClasses.Compact) {
                             false
@@ -235,7 +236,7 @@ fun MyAppBar(
     TopAppBar(
         title = {
             Text(
-                text = title, fontSize = 18.ssp,
+                text = title, fontSize = 18.sp,
                 fontStyle = FontStyle.Normal,
                 fontFamily = FontFamily.Serif,
                 fontWeight = FontWeight.SemiBold

@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.plus.calculatorplus.Calculator
@@ -42,7 +43,6 @@ import com.plus.calculatorplus.presentation.validation.bmiValidation
 import com.plus.calculatorplus.presentation.validation.cmValidation
 import com.plus.calculatorplus.presentation.validation.weightValidation
 import com.plus.calculatorplus.viewmodel.BmiViewModel
-import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 
 
@@ -186,7 +186,7 @@ fun BmiScreen(
 
             }) {
             CustomText(
-                title = "Calculate BMI", size = 14.ssp,
+                title = "Calculate BMI", size = 14.sp,
                 modifier = Modifier.padding(vertical = 2.dp)
             )
 
