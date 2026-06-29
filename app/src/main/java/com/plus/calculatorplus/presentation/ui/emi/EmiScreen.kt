@@ -44,7 +44,7 @@ import com.plus.calculatorplus.domain.validation.loanInterestRateValidation
 import com.plus.calculatorplus.domain.validation.loanYearsValidation
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.loan
+import com.plus.calculatorplus.presentation.icons.credit_card_clock
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -111,7 +111,7 @@ fun EmiScreen(
     ScreenScaffold(
         title = "EMI Calculator",
         subtitle = "Calculate your monthly loan repayments",
-        icon = loan,
+        icon = credit_card_clock,
         showBack = true,
         onBack = onBack,
         modifier = modifier

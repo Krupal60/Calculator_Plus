@@ -854,6 +854,11 @@ fun ScreenScaffold(
     onBack: () -> Unit = {},
     subtitle: String? = null,
     icon: ImageVector? = null,
+    // Option A: simple action icon + handler for quick toggles (e.g. search)
+    actionIcon: ImageVector? = null,
+    onActionClick: (() -> Unit)? = null,
+    actionIconTint: Color = MaterialTheme.colorScheme.onSurface,
+    actionIconBgColor: Color = Color.Transparent,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -899,12 +904,33 @@ fun ScreenScaffold(
                     }
                 },
                 actions = {
+                    // Action icon (clickable) - used for toggles like search
+                    if (actionIcon != null && onActionClick != null) {
+                        Surface(
+                            shape = CircleShape,
+                            color = actionIconBgColor,
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .size(40.dp)
+                        ) {
+                            IconButton(onClick = onActionClick, modifier = Modifier.fillMaxSize()) {
+                                Icon(
+                                    imageVector = actionIcon,
+                                    contentDescription = "Action",
+                                    modifier = Modifier.size(22.dp),
+                                    tint = actionIconTint
+                                )
+                            }
+                        }
+                    }
+
+                    // Decorative / illustrative icon (kept for backwards compatibility)
                     if (icon != null) {
                         Surface(
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
                             modifier = Modifier
-                                .padding(horizontal = 12.dp)
+                                .padding(end = 12.dp)
                                 .size(40.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {

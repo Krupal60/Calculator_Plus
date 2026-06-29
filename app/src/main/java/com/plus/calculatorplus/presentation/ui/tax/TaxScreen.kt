@@ -1,4 +1,6 @@
-package com.plus.calculatorplus.presentation.ui.fd
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+
+package com.plus.calculatorplus.presentation.ui.tax
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -17,8 +19,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,10 +44,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.plus.calculatorplus.domain.validation.fdValidation
+import com.plus.calculatorplus.domain.validation.taxValidation
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.savings
+import com.plus.calculatorplus.presentation.icons.request_quote
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -53,13 +58,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(
+fun TaxScreenMain(
     navigator: Navigator,
     modifier: Modifier = Modifier,
-    viewModel: FdViewModel = koinViewModel()
+    viewModel: TaxViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    FdScreen(
+    TaxScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = { navigator.goBack() },
@@ -68,7 +73,7 @@ fun FdScreenMain(
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is FdEffect.ShowToast -> {
+            is TaxEffect.ShowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -76,16 +81,16 @@ fun FdScreenMain(
 }
 
 @Composable
-fun FdScreen(
-    state: State<FdState>,
-    onAction: (FdAction) -> Unit,
+fun TaxScreen(
+    state: State<TaxState>,
+    onAction: (TaxAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenScaffold(
-        title = "FD Calculator",
-        subtitle = "Calculate fixed deposit returns",
-        icon = savings,
+        title = "Tax / GST Calculator",
+        subtitle = "Add or remove GST and estimate tax",
+        icon = request_quote,
         showBack = true,
         onBack = onBack,
         modifier = modifier
@@ -93,9 +98,9 @@ fun FdScreen(
         val coroutineScope = rememberCoroutineScope()
         val scrollState = rememberScrollState(0)
         val context = LocalContext.current
-        var investmentAmount by rememberSaveable { mutableStateOf("10000") }
-        var interestRate by rememberSaveable { mutableStateOf("7") }
-        var years by rememberSaveable { mutableStateOf("5") }
+        var amount by rememberSaveable { mutableStateOf("1000") }
+        var rate by rememberSaveable { mutableStateOf("18") }
+        var removeGst by rememberSaveable { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -111,42 +116,53 @@ fun FdScreen(
             verticalArrangement = Arrangement.Top
         ) {
 
+            ButtonGroup(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp, top = 8.dp),
+                overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) }
+            ) {
+                toggleableItem(
+                    checked = !removeGst,
+                    onCheckedChange = { removeGst = false },
+                    label = "Add GST",
+                    weight = 1f
+                )
+                toggleableItem(
+                    checked = removeGst,
+                    onCheckedChange = { removeGst = true },
+                    label = "Remove GST",
+                    weight = 1f
+                )
+            }
+
             Text(
-                text = "Investment Details",
+                text = "Amount Details",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 12.dp)
+                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
             )
 
             SliderWithText(
-                "Investment Amount",
-                10000, 10000000,
-                onValueChange = { investmentAmount = it },
-                actionType = ImeAction.Done,
+                if (removeGst) "Gross Amount (incl. GST)" else "Base Amount",
+                1, 1000000,
+                onValueChange = { amount = it },
+                actionType = ImeAction.Next,
                 prefix = "₹",
                 suffix = "",
-                isError = !fdValidation(investmentAmount, interestRate, years).first,
+                isError = !taxValidation(amount, rate).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Rate of Interest (p.a)",
-                7, 20,
-                onValueChange = { interestRate = it },
+                "Tax / GST Rate",
+                1, 100,
+                onValueChange = { rate = it },
                 actionType = ImeAction.Done,
                 prefix = "",
                 suffix = "%",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
-            )
-
-            SliderWithText(
-                "Time Period (Years)",
-                5, 30,
-                onValueChange = { years = it },
-                actionType = ImeAction.Done,
-                prefix = "",
-                suffix = "Yr",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !taxValidation(amount, rate).first,
+                decimalPlaces = 1
             )
 
             Button(
@@ -159,13 +175,13 @@ fun FdScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
-                    val validationResult = fdValidation(investmentAmount, interestRate, years)
+                    val validationResult = taxValidation(amount, rate)
                     if (validationResult.first) {
                         onAction(
-                            FdAction.CalculateFd(
-                                investmentAmount = investmentAmount,
-                                annualInterestRate = interestRate,
-                                years = years
+                            TaxAction.CalculateTax(
+                                amount = amount,
+                                rate = rate,
+                                removeGst = removeGst
                             )
                         )
                         coroutineScope.launch { scrollState.animateScrollTo(Int.MAX_VALUE) }
@@ -182,12 +198,12 @@ fun FdScreen(
                 )
             }
 
-            AnimatedVisibility(state.value.totalValue != "0") {
+            AnimatedVisibility(state.value.totalAmount != "0") {
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,15 +216,15 @@ fun FdScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Investment Summary",
+                            text = "Tax Summary",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            FdSummaryRow("Invested Amount", state.value.totalInvestment)
-                            FdSummaryRow("Estimated Returns", state.value.estimatedReturns)
+                            TaxSummaryRow("Base Amount", state.value.baseAmount)
+                            TaxSummaryRow("Tax / GST", state.value.taxAmount)
 
                             Spacer(modifier = Modifier.height(12.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -220,12 +236,12 @@ fun FdScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Total Value",
+                                    text = "Total Amount",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = getMoneyInWords(state.value.totalValue.toDouble()),
+                                    text = getMoneyInWords(state.value.totalAmount.toDouble()),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary
@@ -240,7 +256,7 @@ fun FdScreen(
 }
 
 @Composable
-private fun FdSummaryRow(label: String, value: String) {
+private fun TaxSummaryRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,19 +274,19 @@ private fun FdSummaryRow(label: String, value: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FdScreenPreview() {
+private fun TaxScreenPreview() {
     CalculatorPlusTheme {
         Surface {
             val state = remember {
                 mutableStateOf(
-                    FdState(
-                        totalInvestment = "100000",
-                        estimatedReturns = "40000",
-                        totalValue = "140000"
+                    TaxState(
+                        baseAmount = "1000",
+                        taxAmount = "180",
+                        totalAmount = "1180"
                     )
                 )
             }
-            FdScreen(
+            TaxScreen(
                 state = state,
                 onAction = {},
                 onBack = {}

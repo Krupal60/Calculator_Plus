@@ -37,4 +37,31 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object DividendScreen : Screen
+
+    @Serializable
+    data object CagrScreen : Screen
+
+    @Serializable
+    data object TaxScreen : Screen
+
+    @Serializable
+    data object LumpsumScreen : Screen
+
+    @Serializable
+    data object InflationScreen : Screen
+
+    @Serializable
+    data object BillSplitterScreen : Screen
+
+    @Serializable
+    data object UnitConverterScreen : Screen
+
+    @Serializable
+    data object AgeDateScreen : Screen
+
+    @Serializable
+    data object LoanAffordabilityScreen : Screen
+
+    @Serializable
+    data object LoanPrepaymentScreen : Screen
 }

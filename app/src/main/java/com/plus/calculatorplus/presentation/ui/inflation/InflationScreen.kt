@@ -1,4 +1,4 @@
-package com.plus.calculatorplus.presentation.ui.fd
+package com.plus.calculatorplus.presentation.ui.inflation
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -39,10 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.plus.calculatorplus.domain.validation.fdValidation
+import com.plus.calculatorplus.domain.validation.inflationScreenValidation
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.savings
+import com.plus.calculatorplus.presentation.icons.trending_down
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -53,13 +53,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(
+fun InflationScreenMain(
     navigator: Navigator,
     modifier: Modifier = Modifier,
-    viewModel: FdViewModel = koinViewModel()
+    viewModel: InflationViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    FdScreen(
+    InflationScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = { navigator.goBack() },
@@ -68,7 +68,7 @@ fun FdScreenMain(
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is FdEffect.ShowToast -> {
+            is InflationEffect.ShowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -76,16 +76,16 @@ fun FdScreenMain(
 }
 
 @Composable
-fun FdScreen(
-    state: State<FdState>,
-    onAction: (FdAction) -> Unit,
+fun InflationScreen(
+    state: State<InflationState>,
+    onAction: (InflationAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenScaffold(
-        title = "FD Calculator",
-        subtitle = "Calculate fixed deposit returns",
-        icon = savings,
+        title = "Inflation Calculator",
+        subtitle = "See how inflation erodes purchasing power",
+        icon = trending_down,
         showBack = true,
         onBack = onBack,
         modifier = modifier
@@ -93,9 +93,9 @@ fun FdScreen(
         val coroutineScope = rememberCoroutineScope()
         val scrollState = rememberScrollState(0)
         val context = LocalContext.current
-        var investmentAmount by rememberSaveable { mutableStateOf("10000") }
-        var interestRate by rememberSaveable { mutableStateOf("7") }
-        var years by rememberSaveable { mutableStateOf("5") }
+        var amount by rememberSaveable { mutableStateOf("100000") }
+        var inflationRate by rememberSaveable { mutableStateOf("6") }
+        var years by rememberSaveable { mutableStateOf("10") }
 
         Column(
             modifier = Modifier
@@ -112,41 +112,43 @@ fun FdScreen(
         ) {
 
             Text(
-                text = "Investment Details",
+                text = "Inflation Details",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
             SliderWithText(
-                "Investment Amount",
-                10000, 10000000,
-                onValueChange = { investmentAmount = it },
-                actionType = ImeAction.Done,
+                "Current Amount",
+                1, 10000000,
+                onValueChange = { amount = it },
+                actionType = ImeAction.Next,
                 prefix = "₹",
                 suffix = "",
-                isError = !fdValidation(investmentAmount, interestRate, years).first,
+                isError = !inflationScreenValidation(amount, inflationRate, years).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Rate of Interest (p.a)",
-                7, 20,
-                onValueChange = { interestRate = it },
-                actionType = ImeAction.Done,
+                "Inflation Rate (Annual)",
+                1, 30,
+                onValueChange = { inflationRate = it },
+                actionType = ImeAction.Next,
                 prefix = "",
                 suffix = "%",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !inflationScreenValidation(amount, inflationRate, years).first,
+                decimalPlaces = 1
             )
 
             SliderWithText(
-                "Time Period (Years)",
-                5, 30,
+                "Number of Years",
+                1, 40,
                 onValueChange = { years = it },
                 actionType = ImeAction.Done,
                 prefix = "",
                 suffix = "Yr",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !inflationScreenValidation(amount, inflationRate, years).first,
+                decimalPlaces = 1
             )
 
             Button(
@@ -159,12 +161,12 @@ fun FdScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
-                    val validationResult = fdValidation(investmentAmount, interestRate, years)
+                    val validationResult = inflationScreenValidation(amount, inflationRate, years)
                     if (validationResult.first) {
                         onAction(
-                            FdAction.CalculateFd(
-                                investmentAmount = investmentAmount,
-                                annualInterestRate = interestRate,
+                            InflationAction.CalculateInflation(
+                                amount = amount,
+                                inflationRate = inflationRate,
                                 years = years
                             )
                         )
@@ -182,12 +184,12 @@ fun FdScreen(
                 )
             }
 
-            AnimatedVisibility(state.value.totalValue != "0") {
+            AnimatedVisibility(state.value.futureCost != "0") {
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,15 +202,15 @@ fun FdScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Investment Summary",
+                            text = "Inflation Impact",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            FdSummaryRow("Invested Amount", state.value.totalInvestment)
-                            FdSummaryRow("Estimated Returns", state.value.estimatedReturns)
+                            InflationSummaryRow("Current Amount", state.value.currentAmount)
+                            InflationSummaryRow("Future Cost (same basket)", state.value.futureCost)
 
                             Spacer(modifier = Modifier.height(12.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -220,12 +222,12 @@ fun FdScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Total Value",
+                                    text = "Worth Today",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = getMoneyInWords(state.value.totalValue.toDouble()),
+                                    text = getMoneyInWords(state.value.purchasingPower.toDouble()),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary
@@ -240,7 +242,7 @@ fun FdScreen(
 }
 
 @Composable
-private fun FdSummaryRow(label: String, value: String) {
+private fun InflationSummaryRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,19 +260,19 @@ private fun FdSummaryRow(label: String, value: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FdScreenPreview() {
+private fun InflationScreenPreview() {
     CalculatorPlusTheme {
         Surface {
             val state = remember {
                 mutableStateOf(
-                    FdState(
-                        totalInvestment = "100000",
-                        estimatedReturns = "40000",
-                        totalValue = "140000"
+                    InflationState(
+                        currentAmount = "100000",
+                        futureCost = "179085",
+                        purchasingPower = "55839"
                     )
                 )
             }
-            FdScreen(
+            InflationScreen(
                 state = state,
                 onAction = {},
                 onBack = {}

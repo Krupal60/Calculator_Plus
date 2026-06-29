@@ -1,4 +1,4 @@
-package com.plus.calculatorplus.presentation.ui.fd
+package com.plus.calculatorplus.presentation.ui.lumpsum
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -39,27 +39,29 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.plus.calculatorplus.domain.validation.fdValidation
+import com.plus.calculatorplus.domain.validation.lumpsumScreenValidation
+import com.plus.calculatorplus.presentation.components.PieChart
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.savings
+import com.plus.calculatorplus.presentation.icons.account_balance_wallet
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(
+fun LumpsumScreenMain(
     navigator: Navigator,
     modifier: Modifier = Modifier,
-    viewModel: FdViewModel = koinViewModel()
+    viewModel: LumpsumViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    FdScreen(
+    LumpsumScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = { navigator.goBack() },
@@ -68,7 +70,7 @@ fun FdScreenMain(
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is FdEffect.ShowToast -> {
+            is LumpsumEffect.ShowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -76,16 +78,16 @@ fun FdScreenMain(
 }
 
 @Composable
-fun FdScreen(
-    state: State<FdState>,
-    onAction: (FdAction) -> Unit,
+fun LumpsumScreen(
+    state: State<LumpsumState>,
+    onAction: (LumpsumAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenScaffold(
-        title = "FD Calculator",
-        subtitle = "Calculate fixed deposit returns",
-        icon = savings,
+        title = "Lump Sum Calculator",
+        subtitle = "Future value of a one-time investment",
+        icon = account_balance_wallet,
         showBack = true,
         onBack = onBack,
         modifier = modifier
@@ -93,8 +95,8 @@ fun FdScreen(
         val coroutineScope = rememberCoroutineScope()
         val scrollState = rememberScrollState(0)
         val context = LocalContext.current
-        var investmentAmount by rememberSaveable { mutableStateOf("10000") }
-        var interestRate by rememberSaveable { mutableStateOf("7") }
+        var principal by rememberSaveable { mutableStateOf("100000") }
+        var annualRate by rememberSaveable { mutableStateOf("12") }
         var years by rememberSaveable { mutableStateOf("5") }
 
         Column(
@@ -120,33 +122,35 @@ fun FdScreen(
 
             SliderWithText(
                 "Investment Amount",
-                10000, 10000000,
-                onValueChange = { investmentAmount = it },
-                actionType = ImeAction.Done,
+                500, 10000000,
+                onValueChange = { principal = it },
+                actionType = ImeAction.Next,
                 prefix = "₹",
                 suffix = "",
-                isError = !fdValidation(investmentAmount, interestRate, years).first,
+                isError = !lumpsumScreenValidation(principal, annualRate, years).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Rate of Interest (p.a)",
-                7, 20,
-                onValueChange = { interestRate = it },
-                actionType = ImeAction.Done,
+                "Interest Rate (Annual)",
+                1, 45,
+                onValueChange = { annualRate = it },
+                actionType = ImeAction.Next,
                 prefix = "",
                 suffix = "%",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !lumpsumScreenValidation(principal, annualRate, years).first,
+                decimalPlaces = 1
             )
 
             SliderWithText(
-                "Time Period (Years)",
-                5, 30,
+                "Investment Years",
+                1, 40,
                 onValueChange = { years = it },
                 actionType = ImeAction.Done,
                 prefix = "",
                 suffix = "Yr",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !lumpsumScreenValidation(principal, annualRate, years).first,
+                decimalPlaces = 1
             )
 
             Button(
@@ -159,12 +163,12 @@ fun FdScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
-                    val validationResult = fdValidation(investmentAmount, interestRate, years)
+                    val validationResult = lumpsumScreenValidation(principal, annualRate, years)
                     if (validationResult.first) {
                         onAction(
-                            FdAction.CalculateFd(
-                                investmentAmount = investmentAmount,
-                                annualInterestRate = interestRate,
+                            LumpsumAction.CalculateLumpsum(
+                                principal = principal,
+                                annualRate = annualRate,
                                 years = years
                             )
                         )
@@ -182,7 +186,7 @@ fun FdScreen(
                 )
             }
 
-            AnimatedVisibility(state.value.totalValue != "0") {
+            AnimatedVisibility(visible = state.value.estimateReturnsAmount != "0") {
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
@@ -206,31 +210,36 @@ fun FdScreen(
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
-                        Column(modifier = Modifier.fillMaxWidth()) {
-                            FdSummaryRow("Invested Amount", state.value.totalInvestment)
-                            FdSummaryRow("Estimated Returns", state.value.estimatedReturns)
-
-                            Spacer(modifier = Modifier.height(12.dp))
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Total Value",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold
+                        PieChart(
+                            data = persistentMapOf(
+                                Pair("Invested Amount", state.value.investedAmount.toLong()),
+                                Pair(
+                                    "Estimated Returns",
+                                    state.value.estimateReturnsAmount.toLong()
                                 )
-                                Text(
-                                    text = getMoneyInWords(state.value.totalValue.toDouble()),
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            )
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Total Value",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = getMoneyInWords(state.value.totalAmount.toDouble()),
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 }
@@ -239,38 +248,21 @@ fun FdScreen(
     }
 }
 
-@Composable
-private fun FdSummaryRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        Text(
-            text = getMoneyInWords(value.toDouble()),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-private fun FdScreenPreview() {
+private fun LumpsumScreenPreview() {
     CalculatorPlusTheme {
         Surface {
             val state = remember {
                 mutableStateOf(
-                    FdState(
-                        totalInvestment = "100000",
-                        estimatedReturns = "40000",
-                        totalValue = "140000"
+                    LumpsumState(
+                        totalAmount = "176234",
+                        estimateReturnsAmount = "76234",
+                        investedAmount = "100000"
                     )
                 )
             }
-            FdScreen(
+            LumpsumScreen(
                 state = state,
                 onAction = {},
                 onBack = {}

@@ -49,6 +49,7 @@ import com.plus.calculatorplus.presentation.components.CustomCard2
 import com.plus.calculatorplus.presentation.components.HeightSliderWithText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.icons.man
+import com.plus.calculatorplus.presentation.icons.monitor_weight
 import com.plus.calculatorplus.presentation.icons.woman
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
@@ -96,7 +97,7 @@ fun BmiScreen(
     ScreenScaffold(
         title = "BMI Calculator",
         subtitle = "Track your health and body composition",
-        icon = man,
+        icon = monitor_weight,
         showBack = true,
         onBack = onBack,
         modifier = modifier

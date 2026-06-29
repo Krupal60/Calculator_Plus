@@ -42,7 +42,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.plus.calculatorplus.domain.validation.dividendValidation
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.dividend
+import com.plus.calculatorplus.presentation.icons.price_check
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -85,7 +85,7 @@ fun DividendScreen(
     ScreenScaffold(
         title = "Dividend Calculator",
         subtitle = "Analyze your stock dividend income",
-        icon = dividend,
+        icon = price_check,
         showBack = true,
         onBack = onBack,
         modifier = modifier

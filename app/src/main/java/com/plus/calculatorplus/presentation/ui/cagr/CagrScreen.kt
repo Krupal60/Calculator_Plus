@@ -1,4 +1,4 @@
-package com.plus.calculatorplus.presentation.ui.fd
+package com.plus.calculatorplus.presentation.ui.cagr
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -39,10 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.plus.calculatorplus.domain.validation.fdValidation
+import com.plus.calculatorplus.domain.validation.cagrValidation
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.savings
+import com.plus.calculatorplus.presentation.icons.trending_up
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -53,13 +53,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(
+fun CagrScreenMain(
     navigator: Navigator,
     modifier: Modifier = Modifier,
-    viewModel: FdViewModel = koinViewModel()
+    viewModel: CagrViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    FdScreen(
+    CagrScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = { navigator.goBack() },
@@ -68,7 +68,7 @@ fun FdScreenMain(
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is FdEffect.ShowToast -> {
+            is CagrEffect.ShowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -76,16 +76,16 @@ fun FdScreenMain(
 }
 
 @Composable
-fun FdScreen(
-    state: State<FdState>,
-    onAction: (FdAction) -> Unit,
+fun CagrScreen(
+    state: State<CagrState>,
+    onAction: (CagrAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenScaffold(
-        title = "FD Calculator",
-        subtitle = "Calculate fixed deposit returns",
-        icon = savings,
+        title = "CAGR Calculator",
+        subtitle = "Compound Annual Growth Rate of your investment",
+        icon = trending_up,
         showBack = true,
         onBack = onBack,
         modifier = modifier
@@ -93,8 +93,8 @@ fun FdScreen(
         val coroutineScope = rememberCoroutineScope()
         val scrollState = rememberScrollState(0)
         val context = LocalContext.current
-        var investmentAmount by rememberSaveable { mutableStateOf("10000") }
-        var interestRate by rememberSaveable { mutableStateOf("7") }
+        var initialValue by rememberSaveable { mutableStateOf("10000") }
+        var finalValue by rememberSaveable { mutableStateOf("20000") }
         var years by rememberSaveable { mutableStateOf("5") }
 
         Column(
@@ -119,34 +119,36 @@ fun FdScreen(
             )
 
             SliderWithText(
-                "Investment Amount",
-                10000, 10000000,
-                onValueChange = { investmentAmount = it },
-                actionType = ImeAction.Done,
+                "Initial Value",
+                100, 1000000,
+                onValueChange = { initialValue = it },
+                actionType = ImeAction.Next,
                 prefix = "₹",
                 suffix = "",
-                isError = !fdValidation(investmentAmount, interestRate, years).first,
+                isError = !cagrValidation(initialValue, finalValue, years).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Rate of Interest (p.a)",
-                7, 20,
-                onValueChange = { interestRate = it },
-                actionType = ImeAction.Done,
-                prefix = "",
-                suffix = "%",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                "Final Value",
+                100, 5000000,
+                onValueChange = { finalValue = it },
+                actionType = ImeAction.Next,
+                prefix = "₹",
+                suffix = "",
+                isError = !cagrValidation(initialValue, finalValue, years).first,
+                visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Time Period (Years)",
-                5, 30,
+                "Number of Years",
+                1, 40,
                 onValueChange = { years = it },
                 actionType = ImeAction.Done,
                 prefix = "",
                 suffix = "Yr",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !cagrValidation(initialValue, finalValue, years).first,
+                decimalPlaces = 1
             )
 
             Button(
@@ -159,12 +161,12 @@ fun FdScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
-                    val validationResult = fdValidation(investmentAmount, interestRate, years)
+                    val validationResult = cagrValidation(initialValue, finalValue, years)
                     if (validationResult.first) {
                         onAction(
-                            FdAction.CalculateFd(
-                                investmentAmount = investmentAmount,
-                                annualInterestRate = interestRate,
+                            CagrAction.CalculateCagr(
+                                initialValue = initialValue,
+                                finalValue = finalValue,
                                 years = years
                             )
                         )
@@ -182,12 +184,12 @@ fun FdScreen(
                 )
             }
 
-            AnimatedVisibility(state.value.totalValue != "0") {
+            AnimatedVisibility(state.value.cagrPercentage != "0") {
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,15 +202,23 @@ fun FdScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Investment Summary",
+                            text = "Growth Summary",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        Text(
+                            text = "${state.value.cagrPercentage}%",
+                            style = MaterialTheme.typography.displaySmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            FdSummaryRow("Invested Amount", state.value.totalInvestment)
-                            FdSummaryRow("Estimated Returns", state.value.estimatedReturns)
+                            CagrSummaryRow("Initial Value", state.value.initialValue)
+                            CagrSummaryRow("Final Value", state.value.finalValue)
 
                             Spacer(modifier = Modifier.height(12.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -220,12 +230,12 @@ fun FdScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Total Value",
+                                    text = "Total Gain",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = getMoneyInWords(state.value.totalValue.toDouble()),
+                                    text = getMoneyInWords(state.value.totalGain.toDouble()),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary
@@ -240,7 +250,7 @@ fun FdScreen(
 }
 
 @Composable
-private fun FdSummaryRow(label: String, value: String) {
+private fun CagrSummaryRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,19 +268,20 @@ private fun FdSummaryRow(label: String, value: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FdScreenPreview() {
+private fun CagrScreenPreview() {
     CalculatorPlusTheme {
         Surface {
             val state = remember {
                 mutableStateOf(
-                    FdState(
-                        totalInvestment = "100000",
-                        estimatedReturns = "40000",
-                        totalValue = "140000"
+                    CagrState(
+                        cagrPercentage = "14.87",
+                        totalGain = "10000",
+                        initialValue = "10000",
+                        finalValue = "20000"
                     )
                 )
             }
-            FdScreen(
+            CagrScreen(
                 state = state,
                 onAction = {},
                 onBack = {}

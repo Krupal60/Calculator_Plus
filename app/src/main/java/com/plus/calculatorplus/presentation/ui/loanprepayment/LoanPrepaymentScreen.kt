@@ -1,4 +1,4 @@
-package com.plus.calculatorplus.presentation.ui.fd
+package com.plus.calculatorplus.presentation.ui.loanprepayment
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -39,10 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.plus.calculatorplus.domain.validation.fdValidation
+import com.plus.calculatorplus.domain.validation.loanPrepaymentValidation
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.savings
+import com.plus.calculatorplus.presentation.icons.acute
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -53,13 +53,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(
+fun LoanPrepaymentScreenMain(
     navigator: Navigator,
     modifier: Modifier = Modifier,
-    viewModel: FdViewModel = koinViewModel()
+    viewModel: LoanPrepaymentViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    FdScreen(
+    LoanPrepaymentScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = { navigator.goBack() },
@@ -68,7 +68,7 @@ fun FdScreenMain(
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is FdEffect.ShowToast -> {
+            is LoanPrepaymentEffect.ShowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -76,16 +76,16 @@ fun FdScreenMain(
 }
 
 @Composable
-fun FdScreen(
-    state: State<FdState>,
-    onAction: (FdAction) -> Unit,
+fun LoanPrepaymentScreen(
+    state: State<LoanPrepaymentState>,
+    onAction: (LoanPrepaymentAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenScaffold(
-        title = "FD Calculator",
-        subtitle = "Calculate fixed deposit returns",
-        icon = savings,
+        title = "Loan Prepayment",
+        subtitle = "Interest saved with extra payments",
+        icon = acute,
         showBack = true,
         onBack = onBack,
         modifier = modifier
@@ -93,9 +93,12 @@ fun FdScreen(
         val coroutineScope = rememberCoroutineScope()
         val scrollState = rememberScrollState(0)
         val context = LocalContext.current
-        var investmentAmount by rememberSaveable { mutableStateOf("10000") }
-        var interestRate by rememberSaveable { mutableStateOf("7") }
-        var years by rememberSaveable { mutableStateOf("5") }
+        var principal by rememberSaveable { mutableStateOf("1000000") }
+        var interestRate by rememberSaveable { mutableStateOf("9") }
+        var years by rememberSaveable { mutableStateOf("20") }
+        var extraMonthly by rememberSaveable { mutableStateOf("5000") }
+
+        fun validate() = loanPrepaymentValidation(principal, interestRate, years, extraMonthly)
 
         Column(
             modifier = Modifier
@@ -112,41 +115,53 @@ fun FdScreen(
         ) {
 
             Text(
-                text = "Investment Details",
+                text = "Loan Details",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
             SliderWithText(
-                "Investment Amount",
+                "Loan Amount",
                 10000, 10000000,
-                onValueChange = { investmentAmount = it },
-                actionType = ImeAction.Done,
+                onValueChange = { principal = it },
+                actionType = ImeAction.Next,
                 prefix = "₹",
                 suffix = "",
-                isError = !fdValidation(investmentAmount, interestRate, years).first,
+                isError = !validate().first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Rate of Interest (p.a)",
-                7, 20,
+                "Interest Rate (Annual)",
+                1, 30,
                 onValueChange = { interestRate = it },
-                actionType = ImeAction.Done,
+                actionType = ImeAction.Next,
                 prefix = "",
                 suffix = "%",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !validate().first,
+                decimalPlaces = 1
             )
 
             SliderWithText(
-                "Time Period (Years)",
-                5, 30,
+                "Loan Tenure",
+                1, 40,
                 onValueChange = { years = it },
-                actionType = ImeAction.Done,
+                actionType = ImeAction.Next,
                 prefix = "",
                 suffix = "Yr",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !validate().first
+            )
+
+            SliderWithText(
+                "Extra Monthly Payment",
+                0, 500000,
+                onValueChange = { extraMonthly = it },
+                actionType = ImeAction.Done,
+                prefix = "₹",
+                suffix = "",
+                isError = !validate().first,
+                visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             Button(
@@ -159,13 +174,14 @@ fun FdScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
-                    val validationResult = fdValidation(investmentAmount, interestRate, years)
+                    val validationResult = validate()
                     if (validationResult.first) {
                         onAction(
-                            FdAction.CalculateFd(
-                                investmentAmount = investmentAmount,
-                                annualInterestRate = interestRate,
-                                years = years
+                            LoanPrepaymentAction.CalculatePrepayment(
+                                principal = principal,
+                                interestRate = interestRate,
+                                years = years,
+                                extraMonthly = extraMonthly
                             )
                         )
                         coroutineScope.launch { scrollState.animateScrollTo(Int.MAX_VALUE) }
@@ -182,12 +198,12 @@ fun FdScreen(
                 )
             }
 
-            AnimatedVisibility(state.value.totalValue != "0") {
+            AnimatedVisibility(state.value.interestSaved != "0") {
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,15 +216,32 @@ fun FdScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Investment Summary",
+                            text = "Prepayment Benefit",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            FdSummaryRow("Invested Amount", state.value.totalInvestment)
-                            FdSummaryRow("Estimated Returns", state.value.estimatedReturns)
+                            MoneyRow("Interest (Without Prepay)", state.value.originalInterest)
+                            MoneyRow("Interest (With Prepay)", state.value.newInterest)
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Tenure Reduced",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = "${state.value.monthsReduced} months",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
 
                             Spacer(modifier = Modifier.height(12.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -220,12 +253,12 @@ fun FdScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Total Value",
+                                    text = "Interest Saved",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = getMoneyInWords(state.value.totalValue.toDouble()),
+                                    text = getMoneyInWords(state.value.interestSaved.toDouble()),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary
@@ -240,7 +273,7 @@ fun FdScreen(
 }
 
 @Composable
-private fun FdSummaryRow(label: String, value: String) {
+private fun MoneyRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,19 +291,20 @@ private fun FdSummaryRow(label: String, value: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FdScreenPreview() {
+private fun LoanPrepaymentScreenPreview() {
     CalculatorPlusTheme {
         Surface {
             val state = remember {
                 mutableStateOf(
-                    FdState(
-                        totalInvestment = "100000",
-                        estimatedReturns = "40000",
-                        totalValue = "140000"
+                    LoanPrepaymentState(
+                        interestSaved = "850000",
+                        monthsReduced = "78",
+                        originalInterest = "1158000",
+                        newInterest = "308000"
                     )
                 )
             }
-            FdScreen(
+            LoanPrepaymentScreen(
                 state = state,
                 onAction = {},
                 onBack = {}

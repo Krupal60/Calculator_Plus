@@ -1,4 +1,4 @@
-package com.plus.calculatorplus.presentation.ui.fd
+package com.plus.calculatorplus.presentation.ui.billsplitter
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -39,10 +39,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.plus.calculatorplus.domain.validation.fdValidation
+import com.plus.calculatorplus.domain.validation.billSplitterValidation
+import com.plus.calculatorplus.presentation.components.CustomCard2
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
-import com.plus.calculatorplus.presentation.icons.savings
+import com.plus.calculatorplus.presentation.icons.call_split
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
@@ -53,13 +54,13 @@ import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(
+fun BillSplitterScreenMain(
     navigator: Navigator,
     modifier: Modifier = Modifier,
-    viewModel: FdViewModel = koinViewModel()
+    viewModel: BillSplitterViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    FdScreen(
+    BillSplitterScreen(
         state = state,
         onAction = viewModel::onAction,
         onBack = { navigator.goBack() },
@@ -68,7 +69,7 @@ fun FdScreenMain(
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
-            is FdEffect.ShowToast -> {
+            is BillSplitterEffect.ShowToast -> {
                 Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
             }
         }
@@ -76,16 +77,16 @@ fun FdScreenMain(
 }
 
 @Composable
-fun FdScreen(
-    state: State<FdState>,
-    onAction: (FdAction) -> Unit,
+fun BillSplitterScreen(
+    state: State<BillSplitterState>,
+    onAction: (BillSplitterAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ScreenScaffold(
-        title = "FD Calculator",
-        subtitle = "Calculate fixed deposit returns",
-        icon = savings,
+        title = "Bill Splitter",
+        subtitle = "Split the bill and tip across your group",
+        icon = call_split,
         showBack = true,
         onBack = onBack,
         modifier = modifier
@@ -93,9 +94,9 @@ fun FdScreen(
         val coroutineScope = rememberCoroutineScope()
         val scrollState = rememberScrollState(0)
         val context = LocalContext.current
-        var investmentAmount by rememberSaveable { mutableStateOf("10000") }
-        var interestRate by rememberSaveable { mutableStateOf("7") }
-        var years by rememberSaveable { mutableStateOf("5") }
+        var billAmount by rememberSaveable { mutableStateOf("1000") }
+        var tipPercentage by rememberSaveable { mutableStateOf("10") }
+        var people by rememberSaveable { mutableStateOf("2") }
 
         Column(
             modifier = Modifier
@@ -112,41 +113,42 @@ fun FdScreen(
         ) {
 
             Text(
-                text = "Investment Details",
+                text = "Bill Details",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(vertical = 12.dp)
             )
 
             SliderWithText(
-                "Investment Amount",
-                10000, 10000000,
-                onValueChange = { investmentAmount = it },
-                actionType = ImeAction.Done,
+                "Total Bill",
+                1, 1000000,
+                onValueChange = { billAmount = it },
+                actionType = ImeAction.Next,
                 prefix = "₹",
                 suffix = "",
-                isError = !fdValidation(investmentAmount, interestRate, years).first,
+                isError = !billSplitterValidation(billAmount, tipPercentage, people).first,
                 visualTransformation = IndianCurrencyVisualTransformation(showSymbol = false)
             )
 
             SliderWithText(
-                "Rate of Interest (p.a)",
-                7, 20,
-                onValueChange = { interestRate = it },
+                "Tip Percentage",
+                0, 100,
+                onValueChange = { tipPercentage = it },
                 actionType = ImeAction.Done,
                 prefix = "",
                 suffix = "%",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+                isError = !billSplitterValidation(billAmount, tipPercentage, people).first
             )
 
-            SliderWithText(
-                "Time Period (Years)",
-                5, 30,
-                onValueChange = { years = it },
-                actionType = ImeAction.Done,
-                prefix = "",
-                suffix = "Yr",
-                isError = !fdValidation(investmentAmount, interestRate, years).first
+            CustomCard2(
+                text = "Number of People",
+                endText = "People",
+                isError = !billSplitterValidation(billAmount, tipPercentage, people).first,
+                value = people,
+                onValueChange = { people = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
             )
 
             Button(
@@ -159,13 +161,13 @@ fun FdScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 onClick = {
-                    val validationResult = fdValidation(investmentAmount, interestRate, years)
+                    val validationResult = billSplitterValidation(billAmount, tipPercentage, people)
                     if (validationResult.first) {
                         onAction(
-                            FdAction.CalculateFd(
-                                investmentAmount = investmentAmount,
-                                annualInterestRate = interestRate,
-                                years = years
+                            BillSplitterAction.CalculateBillSplit(
+                                billAmount = billAmount,
+                                tipPercentage = tipPercentage,
+                                people = people
                             )
                         )
                         coroutineScope.launch { scrollState.animateScrollTo(Int.MAX_VALUE) }
@@ -182,12 +184,12 @@ fun FdScreen(
                 )
             }
 
-            AnimatedVisibility(state.value.totalValue != "0") {
+            AnimatedVisibility(state.value.grandTotal != "0") {
                 Card(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,15 +202,15 @@ fun FdScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Investment Summary",
+                            text = "Split Summary",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
 
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            FdSummaryRow("Invested Amount", state.value.totalInvestment)
-                            FdSummaryRow("Estimated Returns", state.value.estimatedReturns)
+                            BillSummaryRow("Tip Amount", state.value.tipAmount)
+                            BillSummaryRow("Grand Total", state.value.grandTotal)
 
                             Spacer(modifier = Modifier.height(12.dp))
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -220,12 +222,12 @@ fun FdScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Total Value",
+                                    text = "Per Person",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 Text(
-                                    text = getMoneyInWords(state.value.totalValue.toDouble()),
+                                    text = getMoneyInWords(state.value.perPerson.toDouble()),
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = MaterialTheme.colorScheme.primary
@@ -240,7 +242,7 @@ fun FdScreen(
 }
 
 @Composable
-private fun FdSummaryRow(label: String, value: String) {
+private fun BillSummaryRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,19 +260,19 @@ private fun FdSummaryRow(label: String, value: String) {
 
 @Preview(showBackground = true)
 @Composable
-private fun FdScreenPreview() {
+private fun BillSplitterScreenPreview() {
     CalculatorPlusTheme {
         Surface {
             val state = remember {
                 mutableStateOf(
-                    FdState(
-                        totalInvestment = "100000",
-                        estimatedReturns = "40000",
-                        totalValue = "140000"
+                    BillSplitterState(
+                        tipAmount = "100",
+                        grandTotal = "1100",
+                        perPerson = "550"
                     )
                 )
             }
-            FdScreen(
+            BillSplitterScreen(
                 state = state,
                 onAction = {},
                 onBack = {}

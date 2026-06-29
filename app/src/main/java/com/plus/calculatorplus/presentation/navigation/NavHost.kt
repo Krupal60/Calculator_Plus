@@ -12,17 +12,26 @@ import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import com.plus.calculatorplus.presentation.ui.agedate.AgeDateScreenMain
+import com.plus.calculatorplus.presentation.ui.billsplitter.BillSplitterScreenMain
 import com.plus.calculatorplus.presentation.ui.bmi.BmiScreenMain
+import com.plus.calculatorplus.presentation.ui.cagr.CagrScreenMain
 import com.plus.calculatorplus.presentation.ui.calculator.CalculatorScreen
 import com.plus.calculatorplus.presentation.ui.converters.ConvertersScreenMain
 import com.plus.calculatorplus.presentation.ui.discount.DiscountScreenMain
 import com.plus.calculatorplus.presentation.ui.dividend.DividendScreenMain
 import com.plus.calculatorplus.presentation.ui.emi.EmiScreenMain
 import com.plus.calculatorplus.presentation.ui.fd.FdScreenMain
+import com.plus.calculatorplus.presentation.ui.inflation.InflationScreenMain
+import com.plus.calculatorplus.presentation.ui.loanaffordability.LoanAffordabilityScreenMain
+import com.plus.calculatorplus.presentation.ui.loanprepayment.LoanPrepaymentScreenMain
+import com.plus.calculatorplus.presentation.ui.lumpsum.LumpsumScreenMain
 import com.plus.calculatorplus.presentation.ui.more.MoreServicesScreen
 import com.plus.calculatorplus.presentation.ui.retirement.RetirementScreenMain
 import com.plus.calculatorplus.presentation.ui.sip.SipScreenMain
 import com.plus.calculatorplus.presentation.ui.swp.SwpScreenMain
+import com.plus.calculatorplus.presentation.ui.tax.TaxScreenMain
+import com.plus.calculatorplus.presentation.ui.unitconverter.UnitConverterScreenMain
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -76,6 +85,42 @@ fun NavHost(
 
             entry<Screen.DividendScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 DividendScreenMain(navigator)
+            }
+
+            entry<Screen.CagrScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                CagrScreenMain(navigator)
+            }
+
+            entry<Screen.TaxScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                TaxScreenMain(navigator)
+            }
+
+            entry<Screen.LumpsumScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                LumpsumScreenMain(navigator)
+            }
+
+            entry<Screen.InflationScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                InflationScreenMain(navigator)
+            }
+
+            entry<Screen.BillSplitterScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                BillSplitterScreenMain(navigator)
+            }
+
+            entry<Screen.UnitConverterScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                UnitConverterScreenMain(navigator)
+            }
+
+            entry<Screen.AgeDateScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                AgeDateScreenMain(navigator)
+            }
+
+            entry<Screen.LoanAffordabilityScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                LoanAffordabilityScreenMain(navigator)
+            }
+
+            entry<Screen.LoanPrepaymentScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                LoanPrepaymentScreenMain(navigator)
             }
         }),
         onBack = { navigator.goBack() },
