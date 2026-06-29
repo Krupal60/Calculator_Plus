@@ -23,10 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonShapes
@@ -51,18 +47,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -74,22 +71,28 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.plus.calculatorplus.presentation.icons.arrow_back
+import com.plus.calculatorplus.presentation.icons.keyboard_arrow_left
+import com.plus.calculatorplus.presentation.icons.keyboard_arrow_right
+import com.plus.calculatorplus.presentation.theme.md_theme_dark_inversePrimary
+import com.plus.calculatorplus.presentation.theme.md_theme_dark_onSurface
+import com.plus.calculatorplus.presentation.theme.md_theme_dark_primary
+import com.plus.calculatorplus.presentation.theme.md_theme_dark_secondaryContainer
 import com.plus.calculatorplus.presentation.ui.bmi.BmiState
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
-import com.plus.calculatorplus.ui.theme.md_theme_dark_inversePrimary
-import com.plus.calculatorplus.ui.theme.md_theme_dark_onSurface
-import com.plus.calculatorplus.ui.theme.md_theme_dark_primary
-import com.plus.calculatorplus.ui.theme.md_theme_dark_secondaryContainer
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.roundToInt
 
 @Composable
 fun CalculatorButton(
-    modifier: Modifier,
     text: String,
     color: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     fontSize: TextUnit = 18.sp,
-    autoSize: TextAutoSize? = null,
-    onClick: () -> Unit
+    autoSize: TextAutoSize? = null
 ) {
     Button(
         modifier = modifier
@@ -133,7 +136,7 @@ fun SliderWithText(
     prefix: String,
     suffix: String,
     isError: Boolean,
-    onValueChange: (String) -> Unit,
+    onValueChange: (String) -> Unit, modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None
 ) {
     var value by rememberSaveable(startNumber) { mutableStateOf("$startNumber") }
@@ -148,7 +151,7 @@ fun SliderWithText(
             disabledContainerColor = LightGray,
             disabledContentColor = LightGray
         ),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp)
     ) {
@@ -225,12 +228,12 @@ fun SliderWithText(
 
 @Composable
 fun CustomCard2(
-    modifier: Modifier,
     text: String,
     endText: String,
     isError: Boolean,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
     var value by rememberSaveable(value) {
@@ -275,12 +278,12 @@ fun CustomCard2(
                         onValueChange(value)
                     }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                        imageVector = keyboard_arrow_left,
                         contentDescription = "Minus Number"
                     )
                 }
                 OutlinedTextField(
-                    modifier = modifier.weight(1f),
+                    modifier = Modifier.weight(1f),
                     value = value,
                     onValueChange = {
                         value = it
@@ -303,7 +306,7 @@ fun CustomCard2(
                         onValueChange(value)
                     }) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                        imageVector = keyboard_arrow_right,
                         contentDescription = "Plus Number"
                     )
                 }
@@ -328,15 +331,16 @@ fun CustomCard2(
 }
 
 
+@Suppress("MultipleContentEmitters")
 @Composable
 fun HeightSliderWithText(
-    modifier: Modifier,
-    title: String = "Height",
     startNumber: Int,
     endNumber: Int,
     actionType: ImeAction,
     isError: Boolean,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    title: String = "Height"
 ) {
     var value by rememberSaveable { mutableStateOf("150") }
     var valueFt by rememberSaveable { mutableStateOf("5") }
@@ -348,9 +352,10 @@ fun HeightSliderWithText(
     val focusManager = LocalFocusManager.current
 
     // Logic moved from the bottom of the function to a LaunchedEffect
+    val currentOnValueChange by rememberUpdatedState(onValueChange)
     LaunchedEffect(isCm, text, textFt, textIn) {
-        val finalValue = if (isCm) {
-            text
+        if (isCm) {
+            currentOnValueChange(text)
         } else {
             val textFtToCm = when {
                 textFt.isNotEmpty() && textIn.isNotEmpty() && textIn != "0" && textFt != "0" -> {
@@ -366,10 +371,7 @@ fun HeightSliderWithText(
                     30.48.roundToInt().toString()
                 }
             }
-            onValueChange(textFtToCm)
-        }
-        if (isCm) {
-            onValueChange(text)
+            currentOnValueChange(textFtToCm)
         }
     }
 
@@ -603,10 +605,10 @@ fun HeightSliderWithText(
 @Composable
 fun CustomCard(
     onClick: () -> Unit,
-    icon: Int,
+    icon: ImageVector,
     title: String,
-    modifier: Modifier,
-    backgroundColor: Color
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier, onClick = {
@@ -626,7 +628,7 @@ fun CustomCard(
             verticalArrangement = Arrangement.SpaceAround
         ) {
             Icon(
-                painter = painterResource(id = icon),
+                imageVector = icon,
                 modifier = Modifier
                     .size(55.dp)
                     .padding(top = 8.dp),
@@ -647,8 +649,8 @@ fun CustomCard(
 fun CustomSelectionCard(
     onClick: () -> Unit,
     title: String,
-    modifier: Modifier,
-    backgroundColor: Color
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
@@ -676,9 +678,10 @@ fun CustomSelectionCard(
 }
 
 
+@Suppress("MultipleContentEmitters", "DeferStateReads")
 @Composable
 fun PieChart(
-    data: Map<String, Long>,
+    data: ImmutableMap<String, Long>, modifier: Modifier = Modifier,
     radiusOuter: Dp = 60.dp,
     chartBarWidth: Dp = 20.dp,
     animDuration: Int = 1000,
@@ -695,7 +698,7 @@ fun PieChart(
         floatValue.add(index, 360 * values.toFloat() / totalSum.toFloat())
     }
 
-    val colors = listOf(
+    val colors = persistentListOf(
         md_theme_dark_primary,
         md_theme_dark_secondaryContainer,
         md_theme_dark_inversePrimary,
@@ -717,7 +720,7 @@ fun PieChart(
     )
 
     // if you want to stabilize the Pie Chart you can use value -90f
-    // 90f is used to complete 1/4 of the rotation
+    //  is used to complete 1/4 of the rotation
     val animateRotation by animateFloatAsState(
         targetValue = if (animationPlayed) 90f * 11f else 0f,
         animationSpec = tween(
@@ -734,7 +737,7 @@ fun PieChart(
 
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -754,7 +757,7 @@ fun PieChart(
             Canvas(
                 modifier = Modifier
                     .size(radiusOuter * 2f)
-                    .rotate(animateRotation)
+                    .graphicsLayer { rotationZ = animateRotation }
             ) {
                 // draw each Arc for each data entry in Pie Chart
                 floatValue.forEachIndexed { index, value ->
@@ -777,11 +780,11 @@ fun PieChart(
 
 @Composable
 fun DetailsPieChart(
-    data: Map<String, Long>,
-    colors: List<Color>
+    data: ImmutableMap<String, Long>,
+    colors: ImmutableList<Color>, modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
     ) {
         // create the data items
@@ -798,14 +801,15 @@ fun DetailsPieChart(
 @Composable
 fun DetailsPieChartItem(
     data: Pair<String, Long>,
-    height: Dp = 18.dp,
-    color: Color
+    color: Color,
+    modifier: Modifier = Modifier,
+    height: Dp = 18.dp
 ) {
     Surface(
         color = Color.Transparent
     ) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(bottom = 18.dp, start = 4.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -851,11 +855,10 @@ fun DetailsPieChartItem(
 
 @Composable
 fun CustomText(
-    modifier: Modifier = Modifier,
     title: String,
     size: TextUnit,
+    modifier: Modifier = Modifier,
     fontWeight: FontWeight = FontWeight.Normal
-
 ) {
     Text(
         modifier = modifier,
@@ -871,7 +874,7 @@ fun CustomText(
 
 
 @Composable
-fun BmiResultCard(modifier: Modifier, state: BmiState) {
+fun BmiResultCard(state: BmiState, modifier: Modifier = Modifier) {
     Card(
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.cardElevation(10.dp),
@@ -953,12 +956,13 @@ fun getColorBasedOnInterpretation(interpretation: String): Color {
 @Composable
 fun ScreenScaffold(
     title: String,
+    modifier: Modifier = Modifier,
     showBack: Boolean = false,
     onBack: () -> Unit = {},
-    modifier: Modifier = Modifier,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = {
@@ -974,7 +978,7 @@ fun ScreenScaffold(
                     if (showBack) {
                         IconButton(onClick = onBack) {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = arrow_back,
                                 contentDescription = "Back"
                             )
                         }

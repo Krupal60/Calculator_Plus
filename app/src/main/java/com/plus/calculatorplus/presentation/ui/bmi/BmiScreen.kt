@@ -32,29 +32,37 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.plus.calculatorplus.R
 import com.plus.calculatorplus.presentation.components.BmiResultCard
 import com.plus.calculatorplus.presentation.components.CustomCard
 import com.plus.calculatorplus.presentation.components.CustomCard2
 import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.HeightSliderWithText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
+import com.plus.calculatorplus.presentation.icons.man
+import com.plus.calculatorplus.presentation.icons.woman
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.validation.ageValidate
 import com.plus.calculatorplus.presentation.validation.bmiValidation
 import com.plus.calculatorplus.presentation.validation.cmValidation
 import com.plus.calculatorplus.presentation.validation.weightValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun BmiScreenMain(navigator: Navigator, viewModel: BmiViewModel = viewModel()) {
+fun BmiScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: BmiViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "BMI Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         BmiScreen(paddingValues, state, viewModel::onAction)
     }
@@ -77,7 +85,8 @@ fun BmiScreenMain(navigator: Navigator, viewModel: BmiViewModel = viewModel()) {
 fun BmiScreen(
     paddingValues: PaddingValues,
     state: State<BmiState>,
-    onAction: (BmiAction) -> Unit
+    onAction: (BmiAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -88,7 +97,7 @@ fun BmiScreen(
     var cm by rememberSaveable { mutableStateOf("50") }
 
     Column(
-        Modifier
+        modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -111,7 +120,7 @@ fun BmiScreen(
             CustomCard(
                 backgroundColor = if (isMale) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface,
                 onClick = { isMale = true },
-                icon = R.drawable.male,
+                icon = man,
                 title = "Male",
                 modifier = Modifier
                     .weight(1f)
@@ -121,7 +130,7 @@ fun BmiScreen(
             CustomCard(
                 backgroundColor = if (!isMale) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.inverseOnSurface,
                 onClick = { isMale = false },
-                icon = R.drawable.female,
+                icon = woman,
                 title = "Female",
                 modifier = Modifier
                     .weight(1f)
@@ -150,10 +159,18 @@ fun BmiScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CustomCard2(
-                Modifier.weight(1f), "Weight", "Kg", !weightValidation(weight).first, "50",
+                modifier = Modifier.weight(1f),
+                text = "Weight",
+                endText = "Kg",
+                isError = !weightValidation(weight).first,
+                value = "50",
                 onValueChange = { weight = it })
             CustomCard2(
-                Modifier.weight(1f), "Age", "Years", !ageValidate(age).first, "18",
+                modifier = Modifier.weight(1f),
+                text = "Age",
+                endText = "Years",
+                isError = !ageValidate(age).first,
+                value = "18",
                 onValueChange = { age = it })
         }
 
@@ -183,7 +200,7 @@ fun BmiScreen(
                 modifier = Modifier.padding(vertical = 2.dp)
             )
         }
-        BmiResultCard(modifier = Modifier.fillMaxWidth(), state.value)
+        BmiResultCard(modifier = Modifier.fillMaxWidth(), state = state.value)
     }
 }
 

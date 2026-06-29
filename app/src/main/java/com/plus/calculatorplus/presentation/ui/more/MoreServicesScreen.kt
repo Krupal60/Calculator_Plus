@@ -10,13 +10,26 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
-import com.plus.calculatorplus.R
 import com.plus.calculatorplus.presentation.components.CustomCard
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
+import com.plus.calculatorplus.presentation.icons.bmr
+import com.plus.calculatorplus.presentation.icons.dividend
+import com.plus.calculatorplus.presentation.icons.loan
+import com.plus.calculatorplus.presentation.icons.more
+import com.plus.calculatorplus.presentation.icons.percent_discount
+import com.plus.calculatorplus.presentation.icons.retirement
+import com.plus.calculatorplus.presentation.icons.sip
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
+
+data class ServiceItem(
+    val title: String,
+    val icon: ImageVector,
+    val onClick: () -> Unit
+)
 
 private val calculatorRoutes = setOf<NavKey>(
     Screen.SipScreen, Screen.BmiScreen, Screen.EmiScreen, Screen.ConverterScreen,
@@ -32,26 +45,26 @@ private fun Navigator.navigateReplacing(route: NavKey) {
 }
 
 @Composable
-fun MoreServicesScreen(navigator: Navigator) {
-    ScreenScaffold(title = "More Calculators") { paddingValues ->
+fun MoreServicesScreen(navigator: Navigator, modifier: Modifier = Modifier) {
+    ScreenScaffold(title = "More Calculators", modifier = modifier) { paddingValues ->
         val services = listOf(
-            ServiceItem("EMI", R.drawable.loan) { navigator.navigateReplacing(Screen.EmiScreen) },
-            ServiceItem("Discount", R.drawable.percent_discount) {
+            ServiceItem("EMI", loan) { navigator.navigateReplacing(Screen.EmiScreen) },
+            ServiceItem("Discount", percent_discount) {
                 navigator.navigateReplacing(
                     Screen.DiscountScreen
                 )
             },
-            ServiceItem("SIP", R.drawable.sip) { navigator.navigateReplacing(Screen.SipScreen) },
-            ServiceItem("BMI", R.drawable.bmr) { navigator.navigateReplacing(Screen.BmiScreen) },
-            ServiceItem("FD", R.drawable.more) { navigator.navigateReplacing(Screen.FdScreen) },
-            ServiceItem("SWP", R.drawable.sip) { navigator.navigateReplacing(Screen.SwpScreen) },
+            ServiceItem("SIP", sip) { navigator.navigateReplacing(Screen.SipScreen) },
+            ServiceItem("BMI", bmr) { navigator.navigateReplacing(Screen.BmiScreen) },
+            ServiceItem("FD", more) { navigator.navigateReplacing(Screen.FdScreen) },
+            ServiceItem("SWP", sip) { navigator.navigateReplacing(Screen.SwpScreen) },
             ServiceItem(
                 "Retirement",
-                R.drawable.retirement
+                retirement
             ) { navigator.navigateReplacing(Screen.RetirementScreen) },
             ServiceItem(
                 "Dividend",
-                R.drawable.dividend
+                dividend
             ) { navigator.navigateReplacing(Screen.DividendScreen) }
         )
 
@@ -78,8 +91,3 @@ fun MoreServicesScreen(navigator: Navigator) {
     }
 }
 
-data class ServiceItem(
-    val title: String,
-    val icon: Int,
-    val onClick: () -> Unit
-)

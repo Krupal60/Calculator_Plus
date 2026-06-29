@@ -39,6 +39,7 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
@@ -46,15 +47,21 @@ import com.plus.calculatorplus.presentation.validation.emiValidation
 import com.plus.calculatorplus.presentation.validation.loanAmountValidation
 import com.plus.calculatorplus.presentation.validation.loanInterestRateValidation
 import com.plus.calculatorplus.presentation.validation.yearsValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun EmiScreenMain(navigator: Navigator, viewModel: EmiViewModel = viewModel()) {
+fun EmiScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: EmiViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "EMI Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         EmiScreen(paddingValues, state, viewModel::onAction)
     }
@@ -90,7 +97,7 @@ private fun EmiScreenPreview() {
 @Composable
 fun EmiScreen(
     paddingValues: PaddingValues, state: State<EmiState>,
-    onAction: (EmiAction) -> Unit
+    onAction: (EmiAction) -> Unit, modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
@@ -100,7 +107,7 @@ fun EmiScreen(
     var loanYears by rememberSaveable { mutableStateOf("1") }
 
     Column(
-        Modifier
+        modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -165,7 +172,10 @@ fun EmiScreen(
                 }
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp), title = "Calculate",
+                size = 14.sp
+            )
         }
 
         Card(

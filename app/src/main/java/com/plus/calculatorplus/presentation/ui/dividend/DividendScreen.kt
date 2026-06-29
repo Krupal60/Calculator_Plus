@@ -39,19 +39,26 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.dividendValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun DividendScreenMain(navigator: Navigator, viewModel: DividendViewModel = viewModel()) {
+fun DividendScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: DividendViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "Dividend Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         DividendScreen(paddingValues, state, viewModel::onAction)
     }
@@ -59,10 +66,10 @@ fun DividendScreenMain(navigator: Navigator, viewModel: DividendViewModel = view
     CollectEffect(viewModel.effect) { effect ->
         when (effect) {
             is DividendEffect.ShowToast -> {
-                android.widget.Toast.makeText(
+                Toast.makeText(
                     context,
                     effect.message,
-                    android.widget.Toast.LENGTH_SHORT
+                    Toast.LENGTH_SHORT
                 ).show()
             }
         }
@@ -73,7 +80,8 @@ fun DividendScreenMain(navigator: Navigator, viewModel: DividendViewModel = view
 fun DividendScreen(
     paddingValues: PaddingValues,
     state: State<DividendState>,
-    onAction: (DividendAction) -> Unit
+    onAction: (DividendAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
@@ -83,7 +91,7 @@ fun DividendScreen(
     var numberOfShares by rememberSaveable { mutableStateOf("10") }
 
     Column(
-        Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -143,7 +151,10 @@ fun DividendScreen(
                     .show()
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp), title = "Calculate",
+                size = 14.sp
+            )
         }
 
         Card(

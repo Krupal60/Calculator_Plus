@@ -24,21 +24,23 @@ import com.plus.calculatorplus.presentation.navigation.Navigator
 
 
 @Composable
-fun ConvertersScreenMain(navigator: Navigator) {
+fun ConvertersScreenMain(navigator: Navigator, modifier: Modifier = Modifier) {
     ScreenScaffold(
         title = "Converter tools",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         Converters(paddingValues)
     }
 }
 
 @Composable
-fun Converters(paddingValues: PaddingValues) {
+fun Converters(paddingValues: PaddingValues, modifier: Modifier = Modifier) {
     var selectedConverter by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(
@@ -65,9 +67,9 @@ fun Converters(paddingValues: PaddingValues) {
 }
 
 @Composable
-fun LengthConverterScreen() {
+fun LengthConverterScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -42,6 +42,7 @@ import com.plus.calculatorplus.presentation.components.PieChart
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.validation.inflationValidation
@@ -51,16 +52,23 @@ import com.plus.calculatorplus.presentation.validation.monthlyValidation
 import com.plus.calculatorplus.presentation.validation.sipValidation
 import com.plus.calculatorplus.presentation.validation.stepUpValidation
 import com.plus.calculatorplus.presentation.validation.yearsValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.coroutines.launch
 
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun SipScreenMain(navigator: Navigator, viewModel: SipViewModel = viewModel()) {
+fun SipScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: SipViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "SIP Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         SipScreen(paddingValues, state, viewModel::onAction)
     }
@@ -82,7 +90,7 @@ fun SipScreenMain(navigator: Navigator, viewModel: SipViewModel = viewModel()) {
 fun SipScreen(
     paddingValues: PaddingValues,
     state: State<SipState>,
-    onAction: (SipAction) -> Unit
+    onAction: (SipAction) -> Unit, modifier: Modifier = Modifier
 ) {
     var monthlyInvestment by rememberSaveable { mutableStateOf("100") }
     var lumsumInvestment by rememberSaveable { mutableStateOf("500") }
@@ -98,7 +106,7 @@ fun SipScreen(
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -280,7 +288,10 @@ fun SipScreen(
                 }
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp), title = "Calculate",
+                size = 14.sp
+            )
         }
         AnimatedVisibility(visible = state.value.estimateReturnsAmount.isNotEmpty()) {
             Card(
@@ -302,7 +313,7 @@ fun SipScreen(
                         .padding(horizontal = 10.dp, vertical = 10.dp)
                 ) {
                     PieChart(
-                        data = mapOf(
+                        data = persistentMapOf(
                             Pair("Invested Amount", state.value.investedAmount.toLong()),
                             Pair("Estimate Returns", state.value.estimateReturnsAmount.toLong()),
                             Pair("Total Amount", state.value.totalAmount.toLong())

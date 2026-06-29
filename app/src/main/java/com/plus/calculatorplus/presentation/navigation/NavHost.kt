@@ -12,6 +12,7 @@ import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -30,11 +31,12 @@ import com.plus.calculatorplus.presentation.ui.swp.SwpScreenMain
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun NavHost(
-    navigator: Navigator
+    navigator: Navigator, modifier: Modifier = Modifier
 ) {
     val listDetailStrategy = rememberListDetailSceneStrategy<NavKey>()
 
     NavDisplay(
+        modifier = modifier,
         entries = navigator.state.toEntries(entryProvider {
 
             entry<Screen.CalculatorScreen> {

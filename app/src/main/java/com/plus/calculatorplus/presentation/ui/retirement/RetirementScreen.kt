@@ -39,19 +39,26 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.retirementValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun RetirementScreenMain(navigator: Navigator, viewModel: RetirementViewModel = viewModel()) {
+fun RetirementScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: RetirementViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "Retirement Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         RetirementScreen(paddingValues, state, viewModel::onAction)
     }
@@ -73,7 +80,8 @@ fun RetirementScreenMain(navigator: Navigator, viewModel: RetirementViewModel = 
 fun RetirementScreen(
     paddingValues: PaddingValues,
     state: State<RetirementState>,
-    onAction: (RetirementAction) -> Unit
+    onAction: (RetirementAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
@@ -85,7 +93,7 @@ fun RetirementScreen(
     var currentSavings by rememberSaveable { mutableStateOf("0") }
 
     Column(
-        Modifier
+        modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -193,7 +201,11 @@ fun RetirementScreen(
                     .show()
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp),
+                title = "Calculate",
+                size = 14.sp
+            )
         }
 
         Card(

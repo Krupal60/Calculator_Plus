@@ -39,19 +39,26 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.discountValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun DiscountScreenMain(navigator: Navigator, viewModel: DiscountViewModel = viewModel()) {
+fun DiscountScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: DiscountViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "Discount Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         DiscountScreen(paddingValues, state, viewModel::onAction)
     }
@@ -74,7 +81,8 @@ fun DiscountScreenMain(navigator: Navigator, viewModel: DiscountViewModel = view
 fun DiscountScreen(
     paddingValues: PaddingValues,
     state: State<DiscountState>,
-    onAction: (DiscountAction) -> Unit
+    onAction: (DiscountAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
@@ -83,7 +91,7 @@ fun DiscountScreen(
     var discountPercentage by rememberSaveable { mutableStateOf("10") }
 
     Column(
-        Modifier
+        modifier = modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -131,7 +139,10 @@ fun DiscountScreen(
                     .show()
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp), title = "Calculate",
+                size = 14.sp
+            )
         }
 
         Card(

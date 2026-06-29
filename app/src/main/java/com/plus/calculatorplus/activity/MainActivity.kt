@@ -12,9 +12,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,16 +36,19 @@ import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.plus.calculatorplus.presentation.icons.calculator
+import com.plus.calculatorplus.presentation.icons.more
 import com.plus.calculatorplus.presentation.navigation.NavHost
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
 import com.plus.calculatorplus.presentation.navigation.rememberNavigationState
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.ui.splash.SplashViewModel
 import com.plus.calculatorplus.presentation.util.HeightSizeClasses
 import com.plus.calculatorplus.presentation.util.WidthSizeClasses
 import com.plus.calculatorplus.presentation.util.minHeight
 import com.plus.calculatorplus.presentation.util.minWidth
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -100,6 +100,13 @@ class MainActivity : ComponentActivity() {
             }
             CalculatorPlusTheme {
                 // A surface container using the 'background' color from the theme
+                enableEdgeToEdge(
+                    SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+                    SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.isNavigationBarContrastEnforced = false
+                }
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface
                 ) {
@@ -114,7 +121,7 @@ class MainActivity : ComponentActivity() {
 
                     val navigationState = rememberNavigationState(
                         startRoute = Screen.CalculatorScreen,
-                        topLevelRoutes = setOf(Screen.CalculatorScreen, Screen.MoreScreen)
+                        topLevelRoutes = persistentSetOf(Screen.CalculatorScreen, Screen.MoreScreen)
                     )
                     val navigator = remember { Navigator(navigationState) }
 
@@ -138,13 +145,13 @@ class MainActivity : ComponentActivity() {
                             item(
                                 selected = navigationState.topLevelRoute == Screen.CalculatorScreen,
                                 onClick = { navigator.navigate(Screen.CalculatorScreen) },
-                                icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                                icon = { Icon(calculator, contentDescription = null) },
                                 label = { Text("Calculator") }
                             )
                             item(
                                 selected = navigationState.topLevelRoute == Screen.MoreScreen,
                                 onClick = { navigator.navigate(Screen.MoreScreen) },
-                                icon = { Icon(Icons.Default.Apps, contentDescription = null) },
+                                icon = { Icon(more, contentDescription = null) },
                                 label = { Text("Tools") }
                             )
                         },

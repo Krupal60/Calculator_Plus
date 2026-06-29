@@ -39,21 +39,26 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.swpValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun SwpScreenMain(navigator: Navigator, viewModel: SwpViewModel = viewModel()) {
+fun SwpScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: SwpViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "SWP Calculator",
         showBack = true,
         onBack = { navigator.goBack() }) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
-        SwpScreen(paddingValues, state, viewModel::onAction)
+        SwpScreen(paddingValues, state, viewModel::onAction, modifier)
     }
     val context = LocalContext.current
     CollectEffect(viewModel.effect) { effect ->
@@ -73,7 +78,8 @@ fun SwpScreenMain(navigator: Navigator, viewModel: SwpViewModel = viewModel()) {
 fun SwpScreen(
     paddingValues: PaddingValues,
     state: State<SwpState>,
-    onAction: (SwpAction) -> Unit
+    onAction: (SwpAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
@@ -84,7 +90,7 @@ fun SwpScreen(
     var timePeriodYears by rememberSaveable { mutableStateOf("5") }
 
     Column(
-        Modifier
+        modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -180,7 +186,10 @@ fun SwpScreen(
                     .show()
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp), title = "Calculate",
+                size = 14.sp
+            )
         }
 
         Card(

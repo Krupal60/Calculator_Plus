@@ -6,14 +6,13 @@ coreKtx = "1.19.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
+kotlinxCollectionsImmutable = "0.5.0"
 lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 composeBom = "2026.06.00"
 material3 = "1.5.0-alpha22"
 lifecyclecompose = "2.11.0"
 lifecycleruntimecompose = "2.11.0"
-composeruntimelivedata = "1.11.3"
-materialIconsExtended = "1.7.8"
 reviewKtx = "2.0.2"
 appUpdateKtx = "2.1.0"
 fragmentKtx = "1.8.9"
@@ -39,12 +38,10 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
-androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" , version.ref = "composeruntimelivedata"}
 androidx-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose" , version.ref = "lifecycleruntimecompose"}
 androidx-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose" , version.ref = "lifecyclecompose"}
-androidx-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx" , version.ref = "lifecyclecompose"}
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 app-update-ktx = { module = "com.google.android.play:app-update-ktx", version.ref = "appUpdateKtx" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "reviewKtx" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
 androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }

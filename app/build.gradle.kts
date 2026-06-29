@@ -62,9 +62,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.viewmodel.compose)
-    implementation(libs.androidx.livedata.ktx)
     implementation(libs.androidx.runtime.compose)
-    implementation(libs.androidx.runtime.livedata)
 
     // Navigation 3
     implementation(libs.androidx.navigation3.ui)
@@ -73,10 +71,11 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.core)
 
+    // immutable
+    implementation(libs.kotlinx.collections.immutable)
     // splash screen
     implementation(libs.androidx.core.splashscreen)
     // Material Icon Extension
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.adaptive.layout)
     implementation(libs.androidx.adaptive.navigation)

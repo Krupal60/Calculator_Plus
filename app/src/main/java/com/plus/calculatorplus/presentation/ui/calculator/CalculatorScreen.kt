@@ -40,13 +40,13 @@ import androidx.window.core.layout.WindowSizeClass
 import com.plus.calculatorplus.domain.calculator.CalculatorUseCase
 import com.plus.calculatorplus.presentation.components.CalculatorButton
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
-import com.plus.calculatorplus.ui.theme.orange
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
+import com.plus.calculatorplus.presentation.theme.orange
 
 
 @Composable
-fun CalculatorScreen(viewModel: CalculationViewModel = viewModel()) {
-    ScreenScaffold(title = "Simple Calculator") { innerPadding ->
+fun CalculatorScreen(modifier: Modifier = Modifier, viewModel: CalculationViewModel = viewModel()) {
+    ScreenScaffold(title = "Simple Calculator", modifier = modifier) { innerPadding ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         Calculator(state, viewModel::onAction, innerPadding)
     }
@@ -58,7 +58,8 @@ fun CalculatorScreen(viewModel: CalculationViewModel = viewModel()) {
 fun Calculator(
     state: State<CalculatorState>,
     onAction: (CalculatorAction) -> Unit,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier
 ) {
     val windowAdaptiveInfo = currentWindowAdaptiveInfoV2()
     val isLandscape =
@@ -68,7 +69,7 @@ fun Calculator(
 
     if (isLandscape || isMediumOrWider) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
@@ -189,6 +190,8 @@ fun ButtonsGrid(
             val maxHeightDp = constraints.maxHeight.toDp()
             val cellWidth = (maxWidthDp - gapSize * (cols - 1)) / cols
             val cellHeight = (maxHeightDp - gapSize * (rows - 1)) / rows
+
+            @Suppress("DerivedStateOfCandidate")
             val cellSize =
                 minOf(cellWidth, cellHeight).coerceAtMost(if (isExpanded) 160.dp else 80.dp)
             repeat(cols) { column(cellSize) }
@@ -209,21 +212,22 @@ fun ButtonsGrid(
                 color = when (text) {
                     "÷", "×", "-", "+", "%", "⌫", "AC", "=" -> Color(orange.value)
                     else -> MaterialTheme.colorScheme.onSurface
+                },
+                onClick = {
+                    when (text) {
+                        "AC" -> onAction(CalculatorAction.Clear)
+                        "." -> onAction(CalculatorAction.Decimal)
+                        "⌫" -> onAction(CalculatorAction.Delete)
+                        "÷" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Division))
+                        "%" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Percentage))
+                        "×" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Multiplication))
+                        "-" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Subtraction))
+                        "+" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Addition))
+                        "=" -> onAction(CalculatorAction.Calculate)
+                        else -> onAction(CalculatorAction.Number(number = text))
+                    }
                 }
-            ) {
-                when (text) {
-                    "AC" -> onAction(CalculatorAction.Clear)
-                    "." -> onAction(CalculatorAction.Decimal)
-                    "⌫" -> onAction(CalculatorAction.Delete)
-                    "÷" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Division))
-                    "%" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Percentage))
-                    "×" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Multiplication))
-                    "-" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Subtraction))
-                    "+" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Addition))
-                    "=" -> onAction(CalculatorAction.Calculate)
-                    else -> onAction(CalculatorAction.Number(number = text))
-                }
-            }
+            )
         }
     }
 }

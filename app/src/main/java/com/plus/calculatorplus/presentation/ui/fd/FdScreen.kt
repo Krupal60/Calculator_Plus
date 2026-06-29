@@ -39,19 +39,26 @@ import com.plus.calculatorplus.presentation.components.CustomText
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.components.SliderWithText
 import com.plus.calculatorplus.presentation.navigation.Navigator
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
 import com.plus.calculatorplus.presentation.util.IndianCurrencyVisualTransformation
 import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import com.plus.calculatorplus.presentation.validation.fdValidation
-import com.plus.calculatorplus.ui.theme.CalculatorPlusTheme
 import kotlinx.coroutines.launch
 
+@Suppress("MultipleContentEmitters")
 @Composable
-fun FdScreenMain(navigator: Navigator, viewModel: FdViewModel = viewModel()) {
+fun FdScreenMain(
+    navigator: Navigator,
+    modifier: Modifier = Modifier,
+    viewModel: FdViewModel = viewModel()
+) {
     ScreenScaffold(
         title = "FD Calculator",
         showBack = true,
-        onBack = { navigator.goBack() }) { paddingValues ->
+        onBack = { navigator.goBack() },
+        modifier = modifier
+    ) { paddingValues ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         FdScreen(paddingValues, state, viewModel::onAction)
     }
@@ -73,7 +80,8 @@ fun FdScreenMain(navigator: Navigator, viewModel: FdViewModel = viewModel()) {
 fun FdScreen(
     paddingValues: PaddingValues,
     state: State<FdState>,
-    onAction: (FdAction) -> Unit
+    onAction: (FdAction) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scrollState = rememberScrollState(0)
@@ -83,7 +91,7 @@ fun FdScreen(
     var years by rememberSaveable { mutableStateOf("5") }
 
     Column(
-        Modifier
+        modifier
             .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .verticalScroll(scrollState)
@@ -142,7 +150,10 @@ fun FdScreen(
                     .show()
             }
         }) {
-            CustomText(modifier = Modifier.padding(vertical = 2.dp), "Calculate", 14.sp)
+            CustomText(
+                modifier = Modifier.padding(vertical = 2.dp), title = "Calculate",
+                size = 14.sp
+            )
         }
 
         Card(
