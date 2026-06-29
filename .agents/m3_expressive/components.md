@@ -45,15 +45,15 @@ interaction. Supports single and multi-selection.
 
 ```kotlin
 ButtonGroup {
-    ToggleableButton(
+    toggleableItem(
         selected = isSelected,
         onSelectedChange = { isSelected = it },
         colors = ButtonGroupDefaults.toggleableButtonColors()
     ) {
         Text("Option A")
     }
-    ToggleableButton(/* ... */) { Text("Option B") }
-    ToggleableButton(/* ... */) { Text("Option C") }
+    toggleableItem(/* ... */) { Text("Option B") }
+    toggleableItem(/* ... */) { Text("Option C") }
 }
 ```
 

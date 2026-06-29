@@ -3,7 +3,6 @@ package com.plus.calculatorplus.presentation.ui.converters
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -20,47 +19,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
+import com.plus.calculatorplus.presentation.icons.calculator
 import com.plus.calculatorplus.presentation.navigation.Navigator
 
 
 @Composable
 fun ConvertersScreenMain(navigator: Navigator, modifier: Modifier = Modifier) {
-    ScreenScaffold(
-        title = "Converter tools",
-        showBack = true,
-        onBack = { navigator.goBack() },
-        modifier = modifier
-    ) { paddingValues ->
-        Converters(paddingValues)
-    }
+    Converters(onBack = { navigator.goBack() }, modifier = modifier)
 }
 
 @Composable
-fun Converters(paddingValues: PaddingValues, modifier: Modifier = Modifier) {
-    var selectedConverter by remember { mutableStateOf<String?>(null) }
-
-    Column(
+fun Converters(onBack: () -> Unit, modifier: Modifier = Modifier) {
+    ScreenScaffold(
+        title = "Converter tools",
+        subtitle = "Quick and easy unit conversions",
+        icon = calculator,
+        showBack = true,
+        onBack = onBack,
         modifier = modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxSize()
-            .padding(
-                top = paddingValues.calculateTopPadding(),
-                bottom = paddingValues.calculateBottomPadding(),
-                start = 14.dp,
-                end = 14.dp
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if (selectedConverter == null) {
-            Button(onClick = { selectedConverter = "Length" }) {
-                Text("Length Converter")
-            }
-        } else if (selectedConverter == "Length") {
-            LengthConverterScreen()
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { selectedConverter = null }) {
-                Text("Back to Converter List")
+    ) { paddingValues ->
+        var selectedConverter by remember { mutableStateOf<String?>(null) }
+
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding(),
+                    start = 14.dp,
+                    end = 14.dp
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = if (selectedConverter == null) Arrangement.Top else Arrangement.Center
+        ) {
+            if (selectedConverter == null) {
+                Button(onClick = { selectedConverter = "Length" }) {
+                    Text("Length Converter")
+                }
+            } else if (selectedConverter == "Length") {
+                LengthConverterScreen()
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(onClick = { selectedConverter = null }) {
+                    Text("Back to Converter List")
+                }
             }
         }
     }

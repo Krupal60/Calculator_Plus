@@ -6,15 +6,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class DiscountViewModel : ViewModel() {
+@KoinViewModel
+class DiscountViewModel(
+    private val calculationUseCase: DiscountCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = DiscountCalculationUseCase()
-
-    private val _state = MutableStateFlow(DiscountState())
-    val state: StateFlow<DiscountState> = _state.asStateFlow()
+    val state: StateFlow<DiscountState>
+        field = MutableStateFlow(DiscountState())
 
     private val _effect = Channel<DiscountEffect>(Channel.BUFFERED)
     val effect: Flow<DiscountEffect> = _effect.receiveAsFlow()
@@ -31,11 +33,13 @@ class DiscountViewModel : ViewModel() {
             discountPercentage = action.discountPercentage
         )
         val result = calculationUseCase.calculate(input)
-        _state.value = DiscountState(
-            originalPrice = result.originalPrice,
-            discountPercentage = result.discountPercentage,
-            finalPrice = result.finalPrice,
-            savings = result.savings
-        )
+        state.update {
+            DiscountState(
+                originalPrice = result.originalPrice,
+                discountPercentage = result.discountPercentage,
+                finalPrice = result.finalPrice,
+                savings = result.savings
+            )
+        }
     }
 }

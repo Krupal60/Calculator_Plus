@@ -6,15 +6,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class FdViewModel : ViewModel() {
+@KoinViewModel
+class FdViewModel(
+    private val calculationUseCase: FdCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = FdCalculationUseCase()
-
-    private val _state = MutableStateFlow(FdState())
-    val state: StateFlow<FdState> = _state.asStateFlow()
+    val state: StateFlow<FdState>
+        field = MutableStateFlow(FdState())
 
     private val _effect = Channel<FdEffect>(Channel.BUFFERED)
     val effect: Flow<FdEffect> = _effect.receiveAsFlow()
@@ -32,10 +34,12 @@ class FdViewModel : ViewModel() {
             years = action.years
         )
         val result = calculationUseCase.calculate(input)
-        _state.value = FdState(
-            totalInvestment = result.totalInvestment,
-            estimatedReturns = result.estimatedReturns,
-            totalValue = result.totalValue
-        )
+        state.update {
+            FdState(
+                totalInvestment = result.totalInvestment,
+                estimatedReturns = result.estimatedReturns,
+                totalValue = result.totalValue
+            )
+        }
     }
 }

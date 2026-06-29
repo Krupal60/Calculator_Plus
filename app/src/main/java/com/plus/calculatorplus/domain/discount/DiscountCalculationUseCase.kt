@@ -1,7 +1,12 @@
 package com.plus.calculatorplus.domain.discount
 
-import kotlin.math.roundToInt
+import com.plus.calculatorplus.domain.toBigDecimalOrZero
+import com.plus.calculatorplus.domain.toCurrencyString
+import org.koin.core.annotation.Singleton
+import java.math.BigDecimal
+import java.math.RoundingMode
 
+@Singleton
 class DiscountCalculationUseCase {
 
     data class DiscountInput(
@@ -17,16 +22,18 @@ class DiscountCalculationUseCase {
     )
 
     fun calculate(input: DiscountInput): DiscountResult {
-        val originalPrice = input.originalPrice.toDoubleOrNull() ?: 0.0
-        val discountPercentage = input.discountPercentage.toDoubleOrNull() ?: 0.0
-        val savings = originalPrice * (discountPercentage / 100.0)
-        val finalPrice = originalPrice - savings
+        val originalPrice = input.originalPrice.toBigDecimalOrZero()
+        val discountPercentage = input.discountPercentage.toBigDecimalOrZero()
+        val savings = originalPrice.multiply(
+            discountPercentage.divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
+        )
+        val finalPrice = originalPrice.subtract(savings)
 
         return DiscountResult(
-            originalPrice = originalPrice.roundToInt().toString(),
-            discountPercentage = discountPercentage.roundToInt().toString(),
-            finalPrice = finalPrice.roundToInt().toString(),
-            savings = savings.roundToInt().toString()
+            originalPrice = originalPrice.toCurrencyString(),
+            discountPercentage = discountPercentage.toCurrencyString(),
+            finalPrice = finalPrice.toCurrencyString(),
+            savings = savings.toCurrencyString()
         )
     }
 }

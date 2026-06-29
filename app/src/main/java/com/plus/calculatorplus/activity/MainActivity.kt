@@ -1,5 +1,6 @@
 package com.plus.calculatorplus.activity
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -11,9 +12,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.WideNavigationRailDefaults
@@ -164,9 +167,11 @@ class MainActivity : ComponentActivity() {
                             )
                         )
                     ) {
-                        NavHost(navigator)
+                        @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+                        Scaffold(contentWindowInsets = WindowInsets()) { _ ->
+                            NavHost(navigator)
+                        }
                     }
-
                 }
             }
         }

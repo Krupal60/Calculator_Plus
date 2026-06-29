@@ -6,15 +6,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class SwpViewModel : ViewModel() {
+@KoinViewModel
+class SwpViewModel(
+    private val calculationUseCase: SwpCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = SwpCalculationUseCase()
-
-    private val _state = MutableStateFlow(SwpState())
-    val state: StateFlow<SwpState> = _state.asStateFlow()
+    val state: StateFlow<SwpState>
+        field = MutableStateFlow(SwpState())
 
     private val _effect = Channel<SwpEffect>(Channel.BUFFERED)
     val effect: Flow<SwpEffect> = _effect.receiveAsFlow()
@@ -33,10 +35,12 @@ class SwpViewModel : ViewModel() {
             timePeriodYears = action.timePeriodYears
         )
         val result = calculationUseCase.calculate(input)
-        _state.value = SwpState(
-            totalInvestment = result.totalInvestment,
-            totalWithdrawal = result.totalWithdrawal,
-            finalValue = result.finalValue
-        )
+        state.update {
+            SwpState(
+                totalInvestment = result.totalInvestment,
+                totalWithdrawal = result.totalWithdrawal,
+                finalValue = result.finalValue
+            )
+        }
     }
 }

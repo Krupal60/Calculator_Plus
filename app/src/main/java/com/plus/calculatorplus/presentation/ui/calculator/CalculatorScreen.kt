@@ -13,15 +13,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.TextAutoSize
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,18 +35,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.window.core.layout.WindowSizeClass
 import com.plus.calculatorplus.domain.calculator.CalculatorUseCase
 import com.plus.calculatorplus.presentation.components.CalculatorButton
-import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.theme.orange
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun CalculatorScreen(modifier: Modifier = Modifier, viewModel: CalculationViewModel = viewModel()) {
-    ScreenScaffold(title = "Simple Calculator", modifier = modifier) { innerPadding ->
+fun CalculatorScreen(
+    modifier: Modifier = Modifier,
+    viewModel: CalculationViewModel = koinViewModel()
+) {
+    Scaffold(modifier = modifier) { innerPadding ->
         val state = viewModel.state.collectAsStateWithLifecycle()
         Calculator(state, viewModel::onAction, innerPadding)
     }
@@ -97,21 +99,22 @@ fun Calculator(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
+            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DisplayCard(
                 state = state,
                 modifier = Modifier
+                    .padding(bottom = 18.dp, top = 10.dp)
                     .fillMaxWidth()
                     .weight(1f)
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(2f),
-                contentAlignment = Alignment.Center
+                    .weight(2f, false),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 ButtonsGrid(onAction = onAction)
             }
@@ -125,14 +128,12 @@ fun DisplayCard(
     modifier: Modifier = Modifier,
     isLandscape: Boolean = false
 ) {
-    Card(
+    Surface(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        elevation = CardDefaults.elevatedCardElevation(12.dp)
+        color = MaterialTheme.colorScheme.inverseOnSurface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        shadowElevation = 12.dp
     ) {
         val displayText = if (state.value.number1.isEmpty()) {
             "0${state.value.operation?.symbol ?: ""}${state.value.number2}"
@@ -141,7 +142,7 @@ fun DisplayCard(
         }
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.BottomEnd
+            contentAlignment = Alignment.BottomCenter
         ) {
             Text(
                 text = displayText,
@@ -205,29 +206,31 @@ fun ButtonsGrid(
             stepSize = 1.sp
         )
         buttons.forEach { text ->
-            CalculatorButton(
-                modifier = Modifier.fillMaxSize(),
-                text = text,
-                autoSize = buttonAutoSize,
-                color = when (text) {
-                    "÷", "×", "-", "+", "%", "⌫", "AC", "=" -> Color(orange.value)
-                    else -> MaterialTheme.colorScheme.onSurface
-                },
-                onClick = {
-                    when (text) {
-                        "AC" -> onAction(CalculatorAction.Clear)
-                        "." -> onAction(CalculatorAction.Decimal)
-                        "⌫" -> onAction(CalculatorAction.Delete)
-                        "÷" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Division))
-                        "%" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Percentage))
-                        "×" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Multiplication))
-                        "-" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Subtraction))
-                        "+" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Addition))
-                        "=" -> onAction(CalculatorAction.Calculate)
-                        else -> onAction(CalculatorAction.Number(number = text))
+            key(text) {
+                CalculatorButton(
+                    modifier = Modifier.fillMaxSize(),
+                    text = text,
+                    autoSize = buttonAutoSize,
+                    color = when (text) {
+                        "÷", "×", "-", "+", "%", "⌫", "AC", "=" -> Color(orange.value)
+                        else -> MaterialTheme.colorScheme.onSurface
+                    },
+                    onClick = {
+                        when (text) {
+                            "AC" -> onAction(CalculatorAction.Clear)
+                            "." -> onAction(CalculatorAction.Decimal)
+                            "⌫" -> onAction(CalculatorAction.Delete)
+                            "÷" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Division))
+                            "%" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Percentage))
+                            "×" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Multiplication))
+                            "-" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Subtraction))
+                            "+" -> onAction(CalculatorAction.Operation(CalculatorUseCase.Operation.Addition))
+                            "=" -> onAction(CalculatorAction.Calculate)
+                            else -> onAction(CalculatorAction.Number(number = text))
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

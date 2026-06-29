@@ -1,21 +1,36 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# General R8/ProGuard rules
+-keepattributes Signature, *Annotation*, EnclosingMethod, InnerClasses
+-keepattributes SourceFile, LineNumberTable
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Kotlinx Serialization
+# Needed to keep generated serializers for @Serializable classes (like your Screen routes)
+-keep @interface kotlinx.serialization.Serializable
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1> {
+    static ** Companion;
+    *** $serializer;
+    *** serializer(...);
+}
+# Keep 'object' declarations marked @Serializable (CalculatorScreen, MoreScreen, etc.)
+-if @kotlinx.serialization.Serializable class ** {
+    public static ** INSTANCE;
+}
+-keepclassmembers class <1> {
+    public static <1> INSTANCE;
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Navigation 3
+# Keep all classes implementing NavKey to ensure route resolution works
+-keep class * implements androidx.navigation3.runtime.NavKey { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Google Play Core (App Update and Review)
+# Necessary for reflection-based lookups in the Play Store service
+-keep class com.google.android.play.core.common.IntentSenderForResultStarter { *; }
+-keep class com.google.android.play.core.tasks.** { *; }
+-keep class com.google.android.play.core.appupdate.** { *; }
+-keep class com.google.android.play.core.review.** { *; }
+-keep class com.google.android.play.core.install.model.** { *; }
+
+# BUG FIX: Required for review-ktx 2.0.2+ to prevent R8 build errors
+-dontwarn com.google.android.gms.common.annotation.NoNullnessRewrite

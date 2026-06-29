@@ -6,15 +6,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class DividendViewModel : ViewModel() {
+@KoinViewModel
+class DividendViewModel(
+    private val calculationUseCase: DividendCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = DividendCalculationUseCase()
-
-    private val _state = MutableStateFlow(DividendState())
-    val state: StateFlow<DividendState> = _state.asStateFlow()
+    val state: StateFlow<DividendState>
+        field = MutableStateFlow(DividendState())
 
     private val _effect = Channel<DividendEffect>(Channel.BUFFERED)
     val effect: Flow<DividendEffect> = _effect.receiveAsFlow()
@@ -32,10 +34,12 @@ class DividendViewModel : ViewModel() {
             numberOfShares = action.numberOfShares
         )
         val result = calculationUseCase.calculate(input)
-        _state.value = DividendState(
-            totalDividend = result.totalDividend,
-            dividendYield = result.dividendYield,
-            annualDividend = result.annualDividend
-        )
+        state.update {
+            DividendState(
+                totalDividend = result.totalDividend,
+                dividendYield = result.dividendYield,
+                annualDividend = result.annualDividend
+            )
+        }
     }
 }

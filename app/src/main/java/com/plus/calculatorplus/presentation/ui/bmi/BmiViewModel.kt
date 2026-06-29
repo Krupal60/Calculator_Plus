@@ -5,14 +5,18 @@ import com.plus.calculatorplus.domain.bmi.BmiCalculationUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class BmiViewModel : ViewModel() {
+@KoinViewModel
+class BmiViewModel(
+    private val calculationUseCase: BmiCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = BmiCalculationUseCase()
-
-    var state = MutableStateFlow(BmiState())
-        private set
+    val state: StateFlow<BmiState>
+        field = MutableStateFlow(BmiState())
 
     private val _effect = Channel<BmiEffect>(Channel.BUFFERED)
     val effect: Flow<BmiEffect> = _effect.receiveAsFlow()
@@ -31,6 +35,6 @@ class BmiViewModel : ViewModel() {
             isMale = action.isMale
         )
         val result = calculationUseCase.calculate(input)
-        state.value = BmiState(bmi = result.bmi, interpretation = result.interpretation)
+        state.update { BmiState(bmi = result.bmi, interpretation = result.interpretation) }
     }
 }

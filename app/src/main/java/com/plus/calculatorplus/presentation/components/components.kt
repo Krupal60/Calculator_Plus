@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 
 package com.plus.calculatorplus.presentation.components
 
@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,9 +29,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonGroup
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ButtonShapes
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -37,7 +42,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderColors
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -67,13 +72,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.plus.calculatorplus.presentation.icons.arrow_back
+import com.plus.calculatorplus.presentation.icons.calculator
 import com.plus.calculatorplus.presentation.icons.keyboard_arrow_left
 import com.plus.calculatorplus.presentation.icons.keyboard_arrow_right
+import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.theme.md_theme_dark_inversePrimary
 import com.plus.calculatorplus.presentation.theme.md_theme_dark_onSurface
 import com.plus.calculatorplus.presentation.theme.md_theme_dark_primary
@@ -83,6 +91,7 @@ import com.plus.calculatorplus.presentation.util.Utils.getMoneyInWords
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlin.math.roundToInt
 
 @Composable
@@ -95,23 +104,15 @@ fun CalculatorButton(
     autoSize: TextAutoSize? = null
 ) {
     Button(
-        modifier = modifier
-            .clickable {
-                onClick()
-            },
-        shapes = ButtonShapes(
-            CircleShape,
-            RoundedCornerShape(24.dp)
-        ),
+        modifier = modifier.clickable { onClick() },
+        shapes = ButtonShapes(CircleShape, RoundedCornerShape(24.dp)),
         colors = ButtonColors(
             containerColor = color,
             contentColor = MaterialTheme.colorScheme.inverseOnSurface,
             disabledContainerColor = LightGray,
             disabledContentColor = LightGray
         ),
-        onClick = {
-            onClick()
-        }
+        onClick = { onClick() }
     ) {
         Text(
             text = text,
@@ -136,40 +137,41 @@ fun SliderWithText(
     prefix: String,
     suffix: String,
     isError: Boolean,
-    onValueChange: (String) -> Unit, modifier: Modifier = Modifier,
-    visualTransformation: VisualTransformation = VisualTransformation.None
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    decimalPlaces: Int = 0
 ) {
-    var value by rememberSaveable(startNumber) { mutableStateOf("$startNumber") }
-    var text by rememberSaveable(startNumber) { mutableStateOf("$startNumber") }
+    val initialValue =
+        if (decimalPlaces > 0) "${startNumber}.${"0".repeat(decimalPlaces)}" else "$startNumber"
+    var value by rememberSaveable(startNumber) { mutableStateOf(initialValue) }
+    var text by rememberSaveable(startNumber) { mutableStateOf(initialValue) }
     val focusManager = LocalFocusManager.current
     Card(
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = LightGray,
-            disabledContentColor = LightGray
+        shape = MaterialTheme.shapes.extraLarge,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp)
     ) {
-        Column(modifier = Modifier.padding(vertical = 12.dp, horizontal = 10.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    title,
-                    fontWeight = FontWeight.Normal,
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
                     fontFamily = FontFamily.Serif,
-                    fontStyle = FontStyle.Normal,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Start,
-                    lineHeight = 18.sp,
-                    modifier = Modifier.fillMaxWidth(0.41f)
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .padding(end = 4.dp)
                 )
                 OutlinedTextField(
                     value = text,
@@ -181,46 +183,54 @@ fun SliderWithText(
                         onValueChange(text)
                     },
                     prefix = {
-                        if (prefix.isNotEmpty()) {
-                            Text(text = prefix)
-                        }
+                        if (prefix.isNotEmpty()) Text(
+                            text = prefix,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     },
                     suffix = {
-                        if (suffix.isNotEmpty()) {
-                            Text(text = suffix)
-                        }
+                        if (suffix.isNotEmpty()) Text(
+                            text = suffix,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     },
                     isError = isError,
                     visualTransformation = visualTransformation,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number, imeAction = actionType
+                    shape = MaterialTheme.shapes.large,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        textAlign = TextAlign.End,
+                        fontWeight = FontWeight.Bold
                     ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
-                    }),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = if (decimalPlaces > 0) KeyboardType.Decimal else KeyboardType.Number,
+                        imeAction = actionType
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     singleLine = true,
                     modifier = Modifier
-                        .fillMaxWidth(0.63f)
+                        .weight(0.5f)
                         .wrapContentHeight()
                 )
             }
+            Spacer(modifier = Modifier.size(16.dp))
             Slider(
-                value = value.toFloat(), onValueChange = {
-                    value = it.roundToInt().toString()
+                value = value.toFloatOrNull() ?: startNumber.toFloat(),
+                onValueChange = {
+                    value = if (decimalPlaces > 0) {
+                        "%.${decimalPlaces}f".format(it)
+                    } else {
+                        it.roundToInt().toString()
+                    }
                     text = value
                     onValueChange(text)
-                }, valueRange = startNumber.toFloat()..endNumber.toFloat(), colors = SliderColors(
-                    inactiveTrackColor = Color.Gray,
-                    inactiveTickColor = Color.Gray,
-                    disabledInactiveTickColor = Color.Gray,
-                    disabledActiveTrackColor = Color.Gray,
-                    disabledActiveTickColor = Color.Gray,
-                    disabledInactiveTrackColor = Color.Gray,
-                    disabledThumbColor = Color.Gray,
-                    activeTickColor = MaterialTheme.colorScheme.primary,
+                },
+                valueRange = startNumber.toFloat()..endNumber.toFloat(),
+                colors = SliderDefaults.colors(
                     activeTrackColor = MaterialTheme.colorScheme.primary,
+                    inactiveTrackColor = MaterialTheme.colorScheme.outlineVariant,
                     thumbColor = MaterialTheme.colorScheme.primary
-                ), modifier = Modifier.fillMaxWidth()
+                ),
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -235,47 +245,36 @@ fun CustomCard2(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
-    var value by rememberSaveable(value) {
-        mutableStateOf(value)
-    }
+    var currentValue by rememberSaveable(value) { mutableStateOf(value) }
     val focusManager = LocalFocusManager.current
     Card(
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = LightGray,
-            disabledContentColor = LightGray
-        ), modifier = modifier
-
+        shape = MaterialTheme.shapes.extraLarge,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        modifier = modifier
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(vertical = 8.dp)
         ) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.SemiBold
+            )
             Row(
-                modifier = Modifier.padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = text, fontSize = 12.sp,
-                    fontStyle = FontStyle.Normal,
-                    fontFamily = FontFamily.Serif,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            Row(
-                horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    modifier = Modifier,
                     onClick = {
-                        value = (value.toInt() - 1).toString()
-                        onValueChange(value)
+                        currentValue = (currentValue.toInt() - 1).toString()
+                        onValueChange(currentValue)
                     }) {
                     Icon(
                         imageVector = keyboard_arrow_left,
@@ -284,26 +283,26 @@ fun CustomCard2(
                 }
                 OutlinedTextField(
                     modifier = Modifier.weight(1f),
-                    value = value,
+                    value = currentValue,
                     onValueChange = {
-                        value = it
+                        currentValue = it
                         onValueChange(it)
                     },
-                    isError = isError, keyboardOptions = KeyboardOptions(
+                    isError = isError,
+                    keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
                     ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
-                    }),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     singleLine = true,
-                    textStyle = MaterialTheme.typography.bodyLargeEmphasized.copy(textAlign = TextAlign.Center)
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        textAlign = TextAlign.Center,
+                    ),
+                    shape = MaterialTheme.shapes.large
                 )
-
                 IconButton(
-                    modifier = Modifier,
                     onClick = {
-                        value = (value.toInt() + 1).toString()
-                        onValueChange(value)
+                        currentValue = (currentValue.toInt() + 1).toString()
+                        onValueChange(currentValue)
                     }) {
                     Icon(
                         imageVector = keyboard_arrow_right,
@@ -311,25 +310,16 @@ fun CustomCard2(
                     )
                 }
             }
-
-            Row(
-                modifier = Modifier.padding(vertical = 10.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = endText,
-                    fontSize = 12.sp,
-                    fontStyle = FontStyle.Normal,
-                    fontFamily = FontFamily.Serif,
-                    fontWeight = FontWeight.Normal
-                )
-            }
-
+            Text(
+                text = endText,
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = FontFamily.Serif,
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
-
 
 @Suppress("MultipleContentEmitters")
 @Composable
@@ -351,88 +341,66 @@ fun HeightSliderWithText(
     var isCm by rememberSaveable { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
-    // Logic moved from the bottom of the function to a LaunchedEffect
     val currentOnValueChange by rememberUpdatedState(onValueChange)
     LaunchedEffect(isCm, text, textFt, textIn) {
         if (isCm) {
             currentOnValueChange(text)
         } else {
             val textFtToCm = when {
-                textFt.isNotEmpty() && textIn.isNotEmpty() && textIn != "0" && textFt != "0" -> {
+                textFt.isNotEmpty() && textIn.isNotEmpty() && textIn != "0" && textFt != "0" ->
                     ((textFt.toDouble() * 30.48) + (textIn.toDouble() * 2.54)).roundToInt()
                         .toString()
-                }
 
-                textFt.isNotEmpty() && textFt != "0" -> {
+                textFt.isNotEmpty() && textFt != "0" ->
                     (textFt.toDouble() * 30.48).roundToInt().toString()
-                }
 
-                else -> {
-                    30.48.roundToInt().toString()
-                }
+                else -> "30"
             }
             currentOnValueChange(textFtToCm)
         }
     }
 
     Card(
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = LightGray,
-            disabledContentColor = LightGray
+        shape = MaterialTheme.shapes.extraLarge,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        modifier = modifier
-            .padding(bottom = 16.dp)
+        modifier = modifier.padding(bottom = 16.dp)
     ) {
         Column(modifier = Modifier.padding(vertical = 12.dp, horizontal = 12.dp)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 15.dp),
+                    .padding(bottom = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     title,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
                     fontFamily = FontFamily.Serif,
-                    fontStyle = FontStyle.Normal,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Start,
-                    lineHeight = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.weight(1f)
                 )
-                Button(
-                    modifier = Modifier.weight(0.5f),
-                    shape = CircleShape,
-                    onClick = { isCm = false },
-                    colors = ButtonColors(
-                        containerColor = if (!isCm) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceBright,
-                        contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                        disabledContentColor = LightGray,
-                        disabledContainerColor = LightGray
-                    )
+                ButtonGroup(
+                    modifier = Modifier.widthIn(max = 150.dp),
+                    overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) }
                 ) {
-                    Text(text = "Ft", color = MaterialTheme.colorScheme.onSurface)
-                }
-
-                Button(
-                    modifier = Modifier.weight(0.5f),
-                    onClick = { isCm = true },
-                    shape = CircleShape,
-                    colors = ButtonColors(
-                        containerColor = if (isCm) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.surfaceBright,
-                        contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                        disabledContentColor = LightGray,
-                        disabledContainerColor = LightGray
+                    toggleableItem(
+                        checked = !isCm,
+                        onCheckedChange = { isCm = false },
+                        label = "Ft",
+                        weight = 1f
                     )
-                ) {
-                    Text(text = "Cm", color = MaterialTheme.colorScheme.onSurface)
+                    toggleableItem(
+                        checked = isCm,
+                        onCheckedChange = { isCm = true },
+                        label = "Cm",
+                        weight = 1f
+                    )
                 }
-
             }
             AnimatedVisibility(
                 visible = isCm,
@@ -446,30 +414,25 @@ fun HeightSliderWithText(
                             value = text
                         }
                     },
-
-                    suffix = {
-                        Text(text = "Cm")
-                    },
+                    suffix = { Text(text = "Cm") },
                     isError = isError,
+                    shape = MaterialTheme.shapes.large,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number, imeAction = actionType
+                        keyboardType = KeyboardType.Number,
+                        imeAction = actionType
                     ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
-                    }),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth(1f)
                         .wrapContentHeight()
                         .align(Alignment.CenterHorizontally)
                 )
-
             }
             AnimatedVisibility(
                 visible = !isCm,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(15.dp),
@@ -479,47 +442,36 @@ fun HeightSliderWithText(
                         value = textFt,
                         onValueChange = {
                             textFt = it
-                            if (textFt.isNotBlank()) {
-                                valueFt = textFt
-                            }
+                            if (textFt.isNotBlank()) valueFt = textFt
                         },
-                        suffix = {
-                            Text(text = "Ft")
-
-                        },
+                        suffix = { Text(text = "Ft") },
                         isError = isError,
+                        shape = MaterialTheme.shapes.large,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number, imeAction = actionType
+                            keyboardType = KeyboardType.Number,
+                            imeAction = actionType
                         ),
-                        keyboardActions = KeyboardActions(onDone = {
-                            focusManager.clearFocus()
-                        }),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                         singleLine = true,
                         modifier = Modifier
                             .weight(1f)
                             .wrapContentHeight()
                             .align(Alignment.CenterVertically)
                     )
-
                     OutlinedTextField(
                         value = textIn,
                         onValueChange = {
                             textIn = it
-                            if (textIn.isNotBlank()) {
-                                valueIn = textIn
-                            }
+                            if (textIn.isNotBlank()) valueIn = textIn
                         },
-                        suffix = {
-                            Text(text = "In")
-
-                        },
+                        suffix = { Text(text = "In") },
                         isError = isError,
+                        shape = MaterialTheme.shapes.large,
                         keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number, imeAction = actionType
+                            keyboardType = KeyboardType.Number,
+                            imeAction = actionType
                         ),
-                        keyboardActions = KeyboardActions(onDone = {
-                            focusManager.clearFocus()
-                        }),
+                        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                         singleLine = true,
                         modifier = Modifier
                             .weight(1f)
@@ -527,8 +479,6 @@ fun HeightSliderWithText(
                             .align(Alignment.CenterVertically)
                     )
                 }
-
-
             }
             AnimatedVisibility(visible = isCm) {
                 Slider(
@@ -538,16 +488,9 @@ fun HeightSliderWithText(
                         text = value
                     },
                     valueRange = startNumber.toFloat()..endNumber.toFloat(),
-                    colors = SliderColors(
-                        inactiveTrackColor = Color.Gray,
-                        inactiveTickColor = Color.Gray,
-                        disabledInactiveTickColor = Color.Gray,
-                        disabledActiveTrackColor = Color.Gray,
-                        disabledActiveTickColor = Color.Gray,
-                        disabledInactiveTrackColor = Color.Gray,
-                        disabledThumbColor = Color.Gray,
-                        activeTickColor = MaterialTheme.colorScheme.primary,
+                    colors = SliderDefaults.colors(
                         activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
                         thumbColor = MaterialTheme.colorScheme.primary
                     ),
                     modifier = Modifier.fillMaxWidth()
@@ -560,47 +503,38 @@ fun HeightSliderWithText(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Slider(
-                        value = valueFt.toFloat(), onValueChange = {
+                        value = valueFt.toFloat(),
+                        onValueChange = {
                             valueFt = it.roundToInt().toString()
                             textFt = valueFt
-                        }, valueRange = 1f..10f, colors = SliderColors(
-                            inactiveTrackColor = Color.Gray,
-                            inactiveTickColor = Color.Gray,
-                            disabledInactiveTickColor = Color.Gray,
-                            disabledActiveTrackColor = Color.Gray,
-                            disabledActiveTickColor = Color.Gray,
-                            disabledInactiveTrackColor = Color.Gray,
-                            disabledThumbColor = Color.Gray,
-                            activeTickColor = MaterialTheme.colorScheme.primary,
+                        },
+                        valueRange = 1f..10f,
+                        colors = SliderDefaults.colors(
                             activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
                             thumbColor = MaterialTheme.colorScheme.primary
-                        ), modifier = Modifier.weight(1f)
+                        ),
+                        modifier = Modifier.weight(1f)
                     )
-
                     Slider(
-                        value = valueIn.toFloat(), onValueChange = {
+                        value = valueIn.toFloat(),
+                        onValueChange = {
                             valueIn = it.roundToInt().toString()
                             textIn = valueIn
-                        }, valueRange = 0f..12f, colors = SliderColors(
-                            inactiveTrackColor = Color.Gray,
-                            inactiveTickColor = Color.Gray,
-                            disabledInactiveTickColor = Color.Gray,
-                            disabledActiveTrackColor = Color.Gray,
-                            disabledActiveTickColor = Color.Gray,
-                            disabledInactiveTrackColor = Color.Gray,
-                            disabledThumbColor = Color.Gray,
-                            activeTickColor = MaterialTheme.colorScheme.primary,
+                        },
+                        valueRange = 0f..12f,
+                        colors = SliderDefaults.colors(
                             activeTrackColor = MaterialTheme.colorScheme.primary,
+                            inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant,
                             thumbColor = MaterialTheme.colorScheme.primary
-                        ), modifier = Modifier.weight(1f)
+                        ),
+                        modifier = Modifier.weight(1f)
                     )
                 }
-
             }
         }
     }
 }
-
 
 @Composable
 fun CustomCard(
@@ -611,13 +545,13 @@ fun CustomCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier, onClick = {
-            onClick()
-        }, elevation = CardDefaults.cardElevation(10.dp), colors = CardColors(
+        modifier = modifier,
+        onClick = { onClick() },
+        shape = MaterialTheme.shapes.extraLarge,
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
             containerColor = backgroundColor,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = LightGray,
-            disabledContentColor = LightGray
+            contentColor = MaterialTheme.colorScheme.onSurface
         )
     ) {
         Column(
@@ -641,59 +575,20 @@ fun CustomCard(
                 fontFamily = FontFamily.Serif
             )
         }
-
     }
 }
-
-@Composable
-fun CustomSelectionCard(
-    onClick: () -> Unit,
-    title: String,
-    backgroundColor: Color,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .wrapContentHeight(), onClick = {
-            onClick()
-        }, elevation = CardDefaults.cardElevation(10.dp), colors = CardColors(
-            containerColor = backgroundColor,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = LightGray,
-            disabledContentColor = LightGray
-        )
-    ) {
-        Text(
-            text = title,
-            fontFamily = FontFamily.Serif,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            fontSize = 14.sp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp, horizontal = 10.dp)
-        )
-    }
-
-}
-
 
 @Suppress("MultipleContentEmitters", "DeferStateReads")
 @Composable
 fun PieChart(
-    data: ImmutableMap<String, Long>, modifier: Modifier = Modifier,
+    data: ImmutableMap<String, Long>,
+    modifier: Modifier = Modifier,
     radiusOuter: Dp = 60.dp,
     chartBarWidth: Dp = 20.dp,
     animDuration: Int = 1000,
 ) {
-
     val totalSum = data.values.sum()
     val floatValue = mutableListOf<Float>()
-
-    // To set the value of each Arc according to
-    // the value given in the data, we have used a simple formula.
-    // For a detailed explanation check out the Medium Article.
-    // The link is in the about section and readme file of this GitHub Repository
     data.values.forEachIndexed { index, values ->
         floatValue.add(index, 360 * values.toFloat() / totalSum.toFloat())
     }
@@ -706,10 +601,8 @@ fun PieChart(
     )
 
     var animationPlayed by remember { mutableStateOf(false) }
-
     var lastValue = 0f
 
-    // it is the diameter value of the Pie
     val animateSize by animateFloatAsState(
         targetValue = if (animationPlayed) radiusOuter.value * 2f else 0f,
         animationSpec = tween(
@@ -719,8 +612,6 @@ fun PieChart(
         ), label = ""
     )
 
-    // if you want to stabilize the Pie Chart you can use value -90f
-    //  is used to complete 1/4 of the rotation
     val animateRotation by animateFloatAsState(
         targetValue = if (animationPlayed) 90f * 11f else 0f,
         animationSpec = tween(
@@ -730,11 +621,9 @@ fun PieChart(
         ), label = ""
     )
 
-    // to play the animation only once when the function is Created or Recomposed
     LaunchedEffect(key1 = true) {
         animationPlayed = true
     }
-
 
     Column(
         modifier = modifier
@@ -743,23 +632,16 @@ fun PieChart(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        DetailsPieChart(
-            data = data,
-            colors = colors
-        )
-        // Pie Chart using Canvas Arc
+        DetailsPieChart(data = data, colors = colors)
         Box(
             modifier = Modifier.size(animateSize.dp),
             contentAlignment = Alignment.Center
         ) {
-            // To see the data in more structured way
-            // Compose Function in which Items are showing data
             Canvas(
                 modifier = Modifier
                     .size(radiusOuter * 2f)
                     .graphicsLayer { rotationZ = animateRotation }
             ) {
-                // draw each Arc for each data entry in Pie Chart
                 floatValue.forEachIndexed { index, value ->
                     drawArc(
                         color = colors[index],
@@ -772,29 +654,22 @@ fun PieChart(
                 }
             }
         }
-
-
     }
-
 }
 
 @Composable
 fun DetailsPieChart(
     data: ImmutableMap<String, Long>,
-    colors: ImmutableList<Color>, modifier: Modifier = Modifier
+    colors: ImmutableList<Color>,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        // create the data items
+    Column(modifier = modifier.fillMaxWidth()) {
         data.values.forEachIndexed { index, value ->
             DetailsPieChartItem(
                 data = Pair(data.keys.elementAt(index), value),
                 color = colors[index]
             )
         }
-
     }
 }
 
@@ -806,24 +681,18 @@ fun DetailsPieChartItem(
     height: Dp = 18.dp
 ) {
     Surface(
-        color = Color.Transparent
+        color = Color.Transparent,
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(bottom = 18.dp, start = 4.dp),
+            modifier = Modifier.padding(bottom = 18.dp, start = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier
-                    .background(
-                        color = color,
-                        shape = RoundedCornerShape(5.dp)
-                    )
+                    .background(color = color, shape = RoundedCornerShape(5.dp))
                     .size(height)
             )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -846,11 +715,8 @@ fun DetailsPieChartItem(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
         }
-
     }
-
 }
 
 @Composable
@@ -872,29 +738,22 @@ fun CustomText(
     )
 }
 
-
 @Composable
 fun BmiResultCard(state: BmiState, modifier: Modifier = Modifier) {
     Card(
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.cardElevation(10.dp),
-        colors = CardColors(
-            containerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            disabledContainerColor = LightGray,
-            disabledContentColor = LightGray
+        shape = MaterialTheme.shapes.extraLarge,
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            contentColor = MaterialTheme.colorScheme.onSurface
         ),
-        modifier = modifier
-            .padding(bottom = 10.dp, top = 12.dp)
+        modifier = modifier.padding(bottom = 10.dp, top = 12.dp)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
             Text(
                 text = "BMI Results",
-                fontFamily = FontFamily.Serif,
-                fontStyle = FontStyle.Normal,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                modifier = Modifier.padding(top = 10.dp)
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
             Row(
                 modifier = Modifier
@@ -902,17 +761,8 @@ fun BmiResultCard(state: BmiState, modifier: Modifier = Modifier) {
                     .padding(top = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                CustomText(
-                    title = "BMI: ",
-                    size = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                CustomText(
-                    title = state.bmi,
-                    size = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
+                CustomText(title = "BMI: ", size = 14.sp, fontWeight = FontWeight.Bold)
+                CustomText(title = state.bmi, size = 14.sp, fontWeight = FontWeight.Bold)
             }
             Row(
                 modifier = Modifier
@@ -942,13 +792,56 @@ fun BmiResultCard(state: BmiState, modifier: Modifier = Modifier) {
     }
 }
 
-// Function to determine color based on interpretation (example)
 fun getColorBasedOnInterpretation(interpretation: String): Color {
     return when (interpretation) {
         "Underweight" -> Color.Yellow
         "Overweight" -> Color.Yellow
         "Obese" -> Color.Red
         else -> md_theme_dark_onSurface
+    }
+}
+
+@Composable
+fun ScreenHeader(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primaryContainer,
+            modifier = Modifier.size(56.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
@@ -959,6 +852,8 @@ fun ScreenScaffold(
     modifier: Modifier = Modifier,
     showBack: Boolean = false,
     onBack: () -> Unit = {},
+    subtitle: String? = null,
+    icon: ImageVector? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -968,19 +863,58 @@ fun ScreenScaffold(
                 title = {
                     Text(
                         text = title,
-                        fontSize = 18.sp,
-                        fontStyle = FontStyle.Normal,
-                        fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
+                },
+                subtitle = {
+                    if (subtitle != null) {
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 navigationIcon = {
                     if (showBack) {
-                        IconButton(onClick = onBack) {
+                        IconButton(
+                            onClick = onBack,
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .size(40.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    CircleShape
+                                )
+                        ) {
                             Icon(
                                 imageVector = arrow_back,
-                                contentDescription = "Back"
+                                contentDescription = "Back",
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
+                        }
+                    }
+                },
+                actions = {
+                    if (icon != null) {
+                        Surface(
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                            modifier = Modifier
+                                .padding(horizontal = 12.dp)
+                                .size(40.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(22.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
+                            }
                         }
                     }
                 },
@@ -991,4 +925,132 @@ fun ScreenScaffold(
         },
         content = content
     )
+}
+
+@Preview
+@Composable
+private fun CalculatorButtonPreview() {
+    CalculatorPlusTheme {
+        CalculatorButton(
+            text = "1",
+            color = MaterialTheme.colorScheme.primary,
+            onClick = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun SliderWithTextPreview() {
+    CalculatorPlusTheme {
+        SliderWithText(
+            title = "Investment",
+            startNumber = 1000,
+            endNumber = 100000,
+            actionType = ImeAction.Done,
+            prefix = "$",
+            suffix = "",
+            isError = false,
+            onValueChange = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CustomCard2Preview() {
+    CalculatorPlusTheme {
+        CustomCard2(
+            text = "Age",
+            endText = "Years",
+            isError = false,
+            value = "25",
+            onValueChange = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun HeightSliderWithTextPreview() {
+    CalculatorPlusTheme {
+        HeightSliderWithText(
+            startNumber = 100,
+            endNumber = 250,
+            actionType = ImeAction.Done,
+            isError = false,
+            onValueChange = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CustomCardPreview() {
+    CalculatorPlusTheme {
+        CustomCard(
+            onClick = {},
+            icon = calculator,
+            title = "Calculator",
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PieChartPreview() {
+    CalculatorPlusTheme {
+        Surface {
+            PieChart(
+                data = persistentMapOf(
+                    "Principal" to 10000L,
+                    "Interest" to 5000L
+                )
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CustomTextPreview() {
+    CalculatorPlusTheme {
+        Surface {
+            CustomText(title = "Hello World", size = 16.sp)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun BmiResultCardPreview() {
+    CalculatorPlusTheme {
+        BmiResultCard(
+            state = BmiState(
+                bmi = "22.5",
+                interpretation = "Normal"
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ScreenScaffoldPreview() {
+    CalculatorPlusTheme {
+        ScreenScaffold(
+            title = "Preview Title",
+            showBack = true
+        ) { paddingValues ->
+            Box(
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Content")
+            }
+        }
+    }
 }

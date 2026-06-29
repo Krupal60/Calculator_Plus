@@ -104,11 +104,15 @@ fun CalculatorPlusTheme(
         SideEffect {
             val window = (view.context as Activity).window
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars =
+                !darkTheme
         }
     }
 
     MaterialExpressiveTheme(
-        colorScheme = colorScheme, typography = Typography, content = content, motionScheme = MotionScheme.expressive(),
+        colorScheme = colorScheme,
+        typography = Typography,
+        content = content,
+        motionScheme = MotionScheme.expressive(),
     )
 }

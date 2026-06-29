@@ -1,7 +1,12 @@
 package com.plus.calculatorplus.domain.dividend
 
-import kotlin.math.roundToInt
+import com.plus.calculatorplus.domain.toBigDecimalOrZero
+import com.plus.calculatorplus.domain.toCurrencyString
+import org.koin.core.annotation.Singleton
+import java.math.BigDecimal
+import java.math.RoundingMode
 
+@Singleton
 class DividendCalculationUseCase {
 
     data class DividendInput(
@@ -17,17 +22,25 @@ class DividendCalculationUseCase {
     )
 
     fun calculate(input: DividendInput): DividendResult {
-        val sharePrice = input.sharePrice.toDoubleOrNull() ?: 0.0
-        val dividendPerShare = input.dividendPerShare.toDoubleOrNull() ?: 0.0
-        val numberOfShares = input.numberOfShares.toDoubleOrNull() ?: 0.0
+        val sharePrice = input.sharePrice.toBigDecimalOrZero()
+        val dividendPerShare = input.dividendPerShare.toBigDecimalOrZero()
+        val numberOfShares = input.numberOfShares.toBigDecimalOrZero()
 
-        val totalDividend = dividendPerShare * numberOfShares
-        val yield = if (sharePrice > 0) (dividendPerShare / sharePrice) * 100 else 0.0
+        val totalDividend = dividendPerShare.multiply(numberOfShares)
+        val yield = if (sharePrice.isGreaterThan(BigDecimal.ZERO)) {
+            dividendPerShare.divide(sharePrice, 10, RoundingMode.HALF_EVEN)
+                .multiply(BigDecimal("100"))
+        } else {
+            BigDecimal.ZERO
+        }
 
         return DividendResult(
-            totalDividend = totalDividend.roundToInt().toString(),
-            dividendYield = String.format("%.2f", yield),
-            annualDividend = totalDividend.roundToInt().toString()
+            totalDividend = totalDividend.toCurrencyString(),
+            dividendYield = yield.setScale(2, RoundingMode.HALF_UP).toPlainString(),
+            annualDividend = totalDividend.toCurrencyString()
         )
     }
+
+    private fun BigDecimal.isGreaterThan(other: BigDecimal): Boolean =
+        this.compareTo(other) > 0
 }

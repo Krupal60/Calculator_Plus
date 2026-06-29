@@ -1,8 +1,13 @@
 package com.plus.calculatorplus.domain.sip
 
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import com.plus.calculatorplus.domain.powExponent
+import com.plus.calculatorplus.domain.toBigDecimalOrZero
+import com.plus.calculatorplus.domain.toCurrencyString
+import org.koin.core.annotation.Singleton
+import java.math.BigDecimal
+import java.math.RoundingMode
 
+@Singleton
 class SipCalculationUseCase {
 
     data class SipInput(
@@ -32,58 +37,71 @@ class SipCalculationUseCase {
     }
 
     private fun calculateLumsum(input: SipInput): SipResult {
-        val principal = input.lumsumAmount.toDouble()
-        val years = input.investedYears.toInt()
-        val nominalAnnualReturn = input.interest.toDouble() / 100
-        val inflation = input.inflationRate.toDouble() / 100
+        val principal = input.lumsumAmount.toBigDecimalOrZero()
+        val years = input.investedYears.toBigDecimalOrZero()
+        val nominalAnnualReturn = input.interest.toBigDecimalOrZero()
+            .divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
+        val inflation = input.inflationRate.toBigDecimalOrZero()
+            .divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
         val effectiveAnnualReturn = if (input.withInflation) {
-            ((1 + nominalAnnualReturn) / (1 + inflation)) - 1
+            BigDecimal.ONE.add(nominalAnnualReturn)
+                .divide(BigDecimal.ONE.add(inflation), 10, RoundingMode.HALF_EVEN)
+                .subtract(BigDecimal.ONE)
         } else {
             nominalAnnualReturn
         }
-        val totalValue = principal * (1 + effectiveAnnualReturn).pow(years.toDouble())
-        val estimatedReturn = totalValue - principal
+        val totalValue = principal.multiply(
+            BigDecimal.ONE.add(effectiveAnnualReturn).powExponent(years.toDouble())
+        )
+        val estimatedReturn = totalValue.subtract(principal)
 
         return SipResult(
-            totalAmount = totalValue.roundToInt().toString(),
-            estimateReturnsAmount = estimatedReturn.roundToInt().toString(),
-            investedAmount = principal.roundToInt().toString()
+            totalAmount = totalValue.toCurrencyString(),
+            estimateReturnsAmount = estimatedReturn.toCurrencyString(),
+            investedAmount = principal.toCurrencyString()
         )
     }
 
     private fun calculateSip(input: SipInput): SipResult {
-        val baseMonthly = input.monthlyAmount.toDouble()
-        val years = input.investedYears.toInt()
-        val nominalAnnualReturn = input.interest.toDouble() / 100
-        val inflation = input.inflationRate.toDouble() / 100
-        val stepUp = input.stepUpPercentage.toDouble() / 100
+        val baseMonthly = input.monthlyAmount.toBigDecimalOrZero()
+        val years = input.investedYears.toBigDecimalOrZero()
+        val nominalAnnualReturn = input.interest.toBigDecimalOrZero()
+            .divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
+        val inflation = input.inflationRate.toBigDecimalOrZero()
+            .divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
+        val stepUp = input.stepUpPercentage.toBigDecimalOrZero()
+            .divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
         val effectiveAnnualReturn = if (input.withInflation) {
-            ((1 + nominalAnnualReturn) / (1 + inflation)) - 1
+            BigDecimal.ONE.add(nominalAnnualReturn)
+                .divide(BigDecimal.ONE.add(inflation), 10, RoundingMode.HALF_EVEN)
+                .subtract(BigDecimal.ONE)
         } else {
             nominalAnnualReturn
         }
-        val monthlyRate = (1 + effectiveAnnualReturn).pow(1.0 / 12) - 1
+        val monthlyRate = BigDecimal.ONE.add(effectiveAnnualReturn)
+            .powExponent(1.0 / 12)
+            .subtract(BigDecimal.ONE)
 
-        var totalValue = 0.0
-        var totalInvested = 0.0
+        var totalValue = BigDecimal.ZERO
+        var totalInvested = BigDecimal.ZERO
         var currentMonthlyAmount = baseMonthly
 
-        for (year in 1..years) {
-            repeat(12) {
-                totalValue = (totalValue + currentMonthlyAmount) * (1 + monthlyRate)
-                totalInvested += currentMonthlyAmount
-            }
-            if (input.withStepUp) {
-                currentMonthlyAmount *= (1 + stepUp)
+        val totalMonths = (years.toDouble() * 12).toInt()
+        for (month in 1..totalMonths) {
+            totalValue =
+                totalValue.add(currentMonthlyAmount).multiply(BigDecimal.ONE.add(monthlyRate))
+            totalInvested = totalInvested.add(currentMonthlyAmount)
+            if (input.withStepUp && month % 12 == 0) {
+                currentMonthlyAmount = currentMonthlyAmount.multiply(BigDecimal.ONE.add(stepUp))
             }
         }
 
-        val estimatedReturn = totalValue - totalInvested
+        val estimatedReturn = totalValue.subtract(totalInvested)
 
         return SipResult(
-            totalAmount = totalValue.roundToInt().toString(),
-            estimateReturnsAmount = estimatedReturn.roundToInt().toString(),
-            investedAmount = totalInvested.roundToInt().toString()
+            totalAmount = totalValue.toCurrencyString(),
+            estimateReturnsAmount = estimatedReturn.toCurrencyString(),
+            investedAmount = totalInvested.toCurrencyString()
         )
     }
 }

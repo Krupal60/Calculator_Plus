@@ -1,8 +1,14 @@
 package com.plus.calculatorplus.domain.emi
 
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import com.plus.calculatorplus.domain.BD_TWELVE
+import com.plus.calculatorplus.domain.powExponent
+import com.plus.calculatorplus.domain.toBigDecimalOrZero
+import com.plus.calculatorplus.domain.toCurrencyString
+import org.koin.core.annotation.Singleton
+import java.math.BigDecimal
+import java.math.RoundingMode
 
+@Singleton
 class EmiCalculationUseCase {
 
     data class EmiInput(
@@ -19,21 +25,24 @@ class EmiCalculationUseCase {
     )
 
     fun calculate(input: EmiInput): EmiResult {
-        val loanAmount = input.loanAmount.toDouble()
-        val annualInterestRate = input.loanInterest.toDouble() / 100.0
-        val loanYears = input.loanYear.toDouble()
-        val monthlyInterestRate = annualInterestRate / 12.0
-        val numberOfPayments = loanYears * 12
-        val emi =
-            (loanAmount * monthlyInterestRate * (1 + monthlyInterestRate).pow(numberOfPayments)) /
-                      ((1 + monthlyInterestRate).pow(numberOfPayments) - 1)
-        val totalPayment = emi * numberOfPayments
-        val totalInterest = totalPayment - loanAmount
+        val loanAmount = input.loanAmount.toBigDecimalOrZero()
+        val annualInterestRate = input.loanInterest.toBigDecimalOrZero()
+            .divide(BigDecimal("100"), 10, RoundingMode.HALF_EVEN)
+        val loanYears = input.loanYear.toBigDecimalOrZero()
+        val monthlyInterestRate = annualInterestRate.divide(BD_TWELVE, 10, RoundingMode.HALF_EVEN)
+        val numberOfPayments = loanYears.multiply(BD_TWELVE)
+        val onePlusRate = BigDecimal.ONE.add(monthlyInterestRate)
+        val powFactor = onePlusRate.powExponent(numberOfPayments.toDouble())
+        val numerator = loanAmount.multiply(monthlyInterestRate).multiply(powFactor)
+        val denominator = powFactor.subtract(BigDecimal.ONE)
+        val emi = numerator.divide(denominator, 10, RoundingMode.HALF_EVEN)
+        val totalPayment = emi.multiply(numberOfPayments)
+        val totalInterest = totalPayment.subtract(loanAmount)
 
         return EmiResult(
-            monthlyEmi = emi.roundToInt().toString(),
-            totalAmount = (loanAmount + totalInterest).roundToInt().toString(),
-            totalInterest = totalInterest.roundToInt().toString(),
+            monthlyEmi = emi.toCurrencyString(),
+            totalAmount = loanAmount.add(totalInterest).toCurrencyString(),
+            totalInterest = totalInterest.toCurrencyString(),
             loanAmount = input.loanAmount
         )
     }

@@ -1,13 +1,9 @@
 package com.plus.calculatorplus.presentation.navigation
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -38,87 +34,72 @@ fun NavHost(
     NavDisplay(
         modifier = modifier,
         entries = navigator.state.toEntries(entryProvider {
-
-            entry<Screen.CalculatorScreen> {
+            entry<Screen.CalculatorScreen>(metadata = defaultTransition) {
                 CalculatorScreen()
             }
 
-            entry<Screen.MoreScreen>(metadata = ListDetailSceneStrategy.listPane()) {
+            entry<Screen.MoreScreen>(metadata = ListDetailSceneStrategy.listPane() + defaultTransition) {
                 MoreServicesScreen(navigator)
             }
 
-            entry<Screen.SipScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.SipScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 SipScreenMain(navigator)
             }
 
-            entry<Screen.BmiScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.BmiScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 BmiScreenMain(navigator)
             }
 
-            entry<Screen.ConverterScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.ConverterScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 ConvertersScreenMain(navigator)
             }
 
-            entry<Screen.EmiScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.EmiScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 EmiScreenMain(navigator)
             }
 
-            entry<Screen.DiscountScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.DiscountScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 DiscountScreenMain(navigator)
             }
 
-            entry<Screen.FdScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.FdScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 FdScreenMain(navigator)
             }
 
-            entry<Screen.SwpScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.SwpScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 SwpScreenMain(navigator)
             }
 
-            entry<Screen.RetirementScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.RetirementScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 RetirementScreenMain(navigator)
             }
 
-            entry<Screen.DividendScreen>(metadata = ListDetailSceneStrategy.detailPane() + verticalSlideTransition) {
+            entry<Screen.DividendScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 DividendScreenMain(navigator)
             }
-
         }),
         onBack = { navigator.goBack() },
         sceneStrategies = listOf(listDetailStrategy),
-        transitionSpec = {
-            slideInHorizontally { it } togetherWith
-                      slideOutHorizontally { -it }
-        },
-        popTransitionSpec = {
-            slideInHorizontally { -it } togetherWith
-                      slideOutHorizontally { it }
-        },
-        predictivePopTransitionSpec = {
-            slideInHorizontally { -it } togetherWith
-                      slideOutHorizontally { it }
-        }
+        transitionSpec = iosTransitionSpec(),
+        popTransitionSpec = iosPopTransitionSpec(),
+        predictivePopTransitionSpec = iosPredictivePopTransitionSpec()
     )
 }
 
-private val verticalSlideTransition =
+private val defaultTransition =
     NavDisplay.transitionSpec {
-        slideInVertically(
-            initialOffsetY = { it },
-            animationSpec = tween(400)
-        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-    } +
-              NavDisplay.popTransitionSpec {
-                  EnterTransition.None togetherWith
-                            slideOutVertically(
-                                targetOffsetY = { it },
-                                animationSpec = tween(400)
-                            )
-              } +
-              NavDisplay.predictivePopTransitionSpec {
-                  EnterTransition.None togetherWith
-                            slideOutVertically(
-                                targetOffsetY = { it },
-                                animationSpec = tween(400)
-                            )
-              }
+        ContentTransform(
+            fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+            fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+        )
+    } + NavDisplay.popTransitionSpec {
+        ContentTransform(
+            fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+            fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+        )
+    } + NavDisplay.predictivePopTransitionSpec {
+        ContentTransform(
+            fadeIn(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+            fadeOut(animationSpec = tween(DEFAULT_TRANSITION_DURATION_MILLISECOND)),
+        )
+    }

@@ -5,14 +5,18 @@ import com.plus.calculatorplus.domain.emi.EmiCalculationUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class EmiViewModel : ViewModel() {
+@KoinViewModel
+class EmiViewModel(
+    private val calculationUseCase: EmiCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = EmiCalculationUseCase()
-
-    var state = MutableStateFlow(EmiState())
-        private set
+    val state: StateFlow<EmiState>
+        field = MutableStateFlow(EmiState())
 
     private val _effect = Channel<EmiEffect>(Channel.BUFFERED)
     val effect: Flow<EmiEffect> = _effect.receiveAsFlow()
@@ -30,16 +34,13 @@ class EmiViewModel : ViewModel() {
             loanYear = action.loanYear
         )
         val result = calculationUseCase.calculate(input)
-        state.value = EmiState(
-            monthlyEmi = result.monthlyEmi,
-            totalAmount = result.totalAmount,
-            totalInterest = result.totalInterest,
-            loanAmount = result.loanAmount
-        )
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        state.value = state.value
+        state.update {
+            EmiState(
+                monthlyEmi = result.monthlyEmi,
+                totalAmount = result.totalAmount,
+                totalInterest = result.totalInterest,
+                loanAmount = result.loanAmount
+            )
+        }
     }
 }

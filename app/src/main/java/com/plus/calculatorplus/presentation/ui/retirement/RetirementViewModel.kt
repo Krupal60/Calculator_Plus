@@ -6,15 +6,17 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class RetirementViewModel : ViewModel() {
+@KoinViewModel
+class RetirementViewModel(
+    private val calculationUseCase: RetirementCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = RetirementCalculationUseCase()
-
-    private val _state = MutableStateFlow(RetirementState())
-    val state: StateFlow<RetirementState> = _state.asStateFlow()
+    val state: StateFlow<RetirementState>
+        field = MutableStateFlow(RetirementState())
 
     private val _effect = Channel<RetirementEffect>(Channel.BUFFERED)
     val effect: Flow<RetirementEffect> = _effect.receiveAsFlow()
@@ -34,10 +36,12 @@ class RetirementViewModel : ViewModel() {
             currentSavings = action.currentSavings
         )
         val result = calculationUseCase.calculate(input)
-        _state.value = RetirementState(
-            retirementCorpus = result.retirementCorpus,
-            totalInvested = result.totalInvested,
-            estimatedReturns = result.estimatedReturns
-        )
+        state.update {
+            RetirementState(
+                retirementCorpus = result.retirementCorpus,
+                totalInvested = result.totalInvested,
+                estimatedReturns = result.estimatedReturns
+            )
+        }
     }
 }

@@ -5,14 +5,18 @@ import com.plus.calculatorplus.domain.sip.SipCalculationUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import org.koin.core.annotation.KoinViewModel
 
-class SipViewModel : ViewModel() {
+@KoinViewModel
+class SipViewModel(
+    private val calculationUseCase: SipCalculationUseCase
+) : ViewModel() {
 
-    private val calculationUseCase = SipCalculationUseCase()
-
-    var state = MutableStateFlow(SipState())
-        private set
+    val state: StateFlow<SipState>
+        field = MutableStateFlow(SipState())
 
     private val _effect = Channel<SipEffect>(Channel.BUFFERED)
     val effect: Flow<SipEffect> = _effect.receiveAsFlow()
@@ -36,15 +40,12 @@ class SipViewModel : ViewModel() {
             stepUpPercentage = action.stepUpPercentage
         )
         val result = calculationUseCase.calculate(input)
-        state.value = SipState(
-            totalAmount = result.totalAmount,
-            estimateReturnsAmount = result.estimateReturnsAmount,
-            investedAmount = result.investedAmount
-        )
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        state.value = SipState()
+        state.update {
+            SipState(
+                totalAmount = result.totalAmount,
+                estimateReturnsAmount = result.estimateReturnsAmount,
+                investedAmount = result.investedAmount
+            )
+        }
     }
 }
