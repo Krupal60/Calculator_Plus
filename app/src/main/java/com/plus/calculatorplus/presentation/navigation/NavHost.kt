@@ -15,6 +15,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.plus.calculatorplus.presentation.ui.agedate.AgeDateScreenMain
 import com.plus.calculatorplus.presentation.ui.billsplitter.BillSplitterScreenMain
 import com.plus.calculatorplus.presentation.ui.bmi.BmiScreenMain
+import com.plus.calculatorplus.presentation.ui.bmr.BmrScreenMain
 import com.plus.calculatorplus.presentation.ui.cagr.CagrScreenMain
 import com.plus.calculatorplus.presentation.ui.calculator.CalculatorScreen
 import com.plus.calculatorplus.presentation.ui.discount.DiscountScreenMain
@@ -31,6 +32,7 @@ import com.plus.calculatorplus.presentation.ui.sip.SipScreenMain
 import com.plus.calculatorplus.presentation.ui.swp.SwpScreenMain
 import com.plus.calculatorplus.presentation.ui.tax.TaxScreenMain
 import com.plus.calculatorplus.presentation.ui.unitconverter.UnitConverterScreenMain
+import com.plus.calculatorplus.presentation.ui.waterintake.WaterIntakeScreenMain
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
@@ -116,6 +118,14 @@ fun NavHost(
 
             entry<Screen.LoanPrepaymentScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 LoanPrepaymentScreenMain(navigator)
+            }
+
+            entry<Screen.WaterIntakeScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                WaterIntakeScreenMain(navigator)
+            }
+
+            entry<Screen.BmrScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
+                BmrScreenMain(navigator)
             }
         }),
         onBack = { navigator.goBack() },

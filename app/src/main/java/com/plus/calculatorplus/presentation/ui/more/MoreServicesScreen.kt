@@ -47,6 +47,7 @@ import com.plus.calculatorplus.presentation.components.CustomCard
 import com.plus.calculatorplus.presentation.components.ScreenScaffold
 import com.plus.calculatorplus.presentation.icons.account_balance_wallet
 import com.plus.calculatorplus.presentation.icons.acute
+import com.plus.calculatorplus.presentation.icons.bmr
 import com.plus.calculatorplus.presentation.icons.cake
 import com.plus.calculatorplus.presentation.icons.call_split
 import com.plus.calculatorplus.presentation.icons.close
@@ -64,6 +65,7 @@ import com.plus.calculatorplus.presentation.icons.sip
 import com.plus.calculatorplus.presentation.icons.swap_horizontal_circle
 import com.plus.calculatorplus.presentation.icons.trending_down
 import com.plus.calculatorplus.presentation.icons.trending_up
+import com.plus.calculatorplus.presentation.icons.water_full
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.navigation.Screen
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
@@ -116,7 +118,9 @@ private val calculatorRoutes = setOf<NavKey>(
     Screen.UnitConverterScreen,
     Screen.AgeDateScreen,
     Screen.LoanAffordabilityScreen,
-    Screen.LoanPrepaymentScreen
+    Screen.LoanPrepaymentScreen,
+    Screen.WaterIntakeScreen,
+    Screen.BmrScreen
 )
 
 private fun Navigator.navigateReplacing(route: NavKey) {
@@ -260,7 +264,17 @@ fun MoreServices(
                     "BMI",
                     monitor_weight,
                     ServiceCategory.Health
-                ) { onServiceClick(Screen.BmiScreen) }
+                ) { onServiceClick(Screen.BmiScreen) },
+                ServiceItem(
+                    "Water Intake",
+                    water_full,
+                    ServiceCategory.Health
+                ) { onServiceClick(Screen.WaterIntakeScreen) },
+                ServiceItem(
+                    "BMR",
+                    bmr,
+                    ServiceCategory.Health
+                ) { onServiceClick(Screen.BmrScreen) }
             )
         }
 

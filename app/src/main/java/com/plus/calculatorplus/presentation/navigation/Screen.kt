@@ -61,4 +61,10 @@ sealed interface Screen : NavKey {
 
     @Serializable
     data object LoanPrepaymentScreen : Screen
+
+    @Serializable
+    data object WaterIntakeScreen : Screen
+
+    @Serializable
+    data object BmrScreen : Screen
 }
