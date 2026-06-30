@@ -2,6 +2,7 @@ package com.plus.calculatorplus.domain
 
 import java.math.BigDecimal
 import java.math.RoundingMode
+import kotlin.math.pow
 
 val BD_ONE_HUNDRED: BigDecimal = BigDecimal("100")
 val BD_FOUR_HUNDRED: BigDecimal = BigDecimal("400")
@@ -17,7 +18,7 @@ fun BigDecimal.powExponent(exp: Double): BigDecimal {
     return if (exp == exp.toInt().toDouble()) {
         this.pow(exp.toInt())
     } else {
-        Math.pow(this.toDouble(), exp).toBigDecimal()
+        this.toDouble().pow(exp).toBigDecimal()
     }
 }
 
