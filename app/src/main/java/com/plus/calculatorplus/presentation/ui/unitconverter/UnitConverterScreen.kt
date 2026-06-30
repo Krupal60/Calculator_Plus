@@ -1,11 +1,21 @@
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
+@file:OptIn(
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class
+)
 
 package com.plus.calculatorplus.presentation.ui.unitconverter
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -13,15 +23,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -35,12 +49,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.plus.calculatorplus.domain.unitconverter.UnitConverterCalculationUseCase.Category
 import com.plus.calculatorplus.domain.validation.unitConverterValidation
@@ -49,6 +65,7 @@ import com.plus.calculatorplus.presentation.icons.swap_horizontal_circle
 import com.plus.calculatorplus.presentation.navigation.Navigator
 import com.plus.calculatorplus.presentation.theme.CalculatorPlusTheme
 import com.plus.calculatorplus.presentation.util.CollectEffect
+import kotlinx.collections.immutable.ImmutableList
 import org.koin.androidx.compose.koinViewModel
 
 @Suppress("MultipleContentEmitters")
@@ -91,7 +108,6 @@ fun UnitConverterScreen(
         modifier = modifier
     ) { paddingValues ->
         val scrollState = rememberScrollState(0)
-        val context = LocalContext.current
 
         var category by rememberSaveable { mutableStateOf(Category.LENGTH) }
         var fromUnit by rememberSaveable { mutableStateOf(Category.LENGTH.units.first()) }
@@ -108,6 +124,7 @@ fun UnitConverterScreen(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.surface)
                 .fillMaxSize()
+                .animateContentSize()
                 .verticalScroll(scrollState)
                 .padding(
                     top = paddingValues.calculateTopPadding(),
@@ -121,7 +138,7 @@ fun UnitConverterScreen(
             ButtonGroup(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp, bottom = 8.dp),
+                    .padding(top = 8.dp, bottom = 12.dp),
                 overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) }
             ) {
                 Category.entries.forEach { cat ->
@@ -139,49 +156,100 @@ fun UnitConverterScreen(
                 }
             }
 
-            Text(
-                text = "Value",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-            )
-
-            OutlinedTextField(
-                value = value,
-                onValueChange = {
-                    value = it
-                    recompute()
-                },
-                isError = !unitConverterValidation(value).first,
-                singleLine = true,
-                shape = MaterialTheme.shapes.large,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done
+            Card(
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                 ),
-                modifier = Modifier.fillMaxWidth()
-            )
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Input",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
 
-            UnitChips(
-                title = "From",
-                units = category.units,
-                selected = fromUnit,
-                onSelect = { fromUnit = it; recompute() }
-            )
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = {
+                            value = it
+                            recompute()
+                        },
+                        label = { Text("Enter value") },
+                        isError = !unitConverterValidation(value).first,
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.extraLarge,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Decimal,
+                            imeAction = ImeAction.Done
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-            UnitChips(
-                title = "To",
-                units = category.units,
-                selected = toUnit,
-                onSelect = { toUnit = it; recompute() }
-            )
+                    UnitChips(
+                        title = "From Unit",
+                        units = category.units,
+                        selected = fromUnit,
+                        onSelect = { fromUnit = it; recompute() }
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                IconButton(
+                    onClick = {
+                        val temp = fromUnit
+                        fromUnit = toUnit
+                        toUnit = temp
+                        recompute()
+                    },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier.graphicsLayer(rotationZ = 90f)
+                ) {
+                    Icon(
+                        imageVector = swap_horizontal_circle,
+                        contentDescription = "Swap Units"
+                    )
+                }
+            }
+
+            Card(
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateContentSize()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    UnitChips(
+                        title = "To Unit",
+                        units = category.units,
+                        selected = toUnit,
+                        onSelect = { toUnit = it; recompute() }
+                    )
+                }
+            }
 
             AnimatedVisibility(state.value.convertedValue.isNotEmpty()) {
                 Card(
-                    shape = RoundedCornerShape(24.dp),
-                    elevation = CardDefaults.cardElevation(4.dp),
+                    shape = MaterialTheme.shapes.extraLarge,
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -190,21 +258,35 @@ fun UnitConverterScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "$value $fromUnit =",
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Text(
-                            text = "${state.value.convertedValue} $toUnit",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        AnimatedContent(
+                            targetState = state.value.convertedValue,
+                            transitionSpec = {
+                                fadeIn() togetherWith fadeOut()
+                            },
+                            label = "ConvertedValueAnimation"
+                        ) { targetValue ->
+                            Text(
+                                text = "$targetValue $toUnit",
+                                style = MaterialTheme.typography.displaySmall,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.primary,
+                                autoSize = TextAutoSize.StepBased(
+                                    minFontSize = 16.sp,
+                                    maxFontSize = 36.sp,
+                                    stepSize = 2.sp
+                                ),
+                                maxLines = 1,
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -215,7 +297,7 @@ fun UnitConverterScreen(
 @Composable
 private fun UnitChips(
     title: String,
-    units: List<String>,
+    units: ImmutableList<String>,
     selected: String,
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -225,17 +307,20 @@ private fun UnitChips(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             units.forEach { unit ->
                 FilterChip(
                     selected = selected == unit,
                     onClick = { onSelect(unit) },
-                    label = { Text(unit) }
+                    label = { Text(unit) },
+                    shape = MaterialTheme.shapes.medium
                 )
             }
         }

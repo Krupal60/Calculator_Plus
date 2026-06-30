@@ -17,7 +17,6 @@ import com.plus.calculatorplus.presentation.ui.billsplitter.BillSplitterScreenMa
 import com.plus.calculatorplus.presentation.ui.bmi.BmiScreenMain
 import com.plus.calculatorplus.presentation.ui.cagr.CagrScreenMain
 import com.plus.calculatorplus.presentation.ui.calculator.CalculatorScreen
-import com.plus.calculatorplus.presentation.ui.converters.ConvertersScreenMain
 import com.plus.calculatorplus.presentation.ui.discount.DiscountScreenMain
 import com.plus.calculatorplus.presentation.ui.dividend.DividendScreenMain
 import com.plus.calculatorplus.presentation.ui.emi.EmiScreenMain
@@ -57,10 +56,6 @@ fun NavHost(
 
             entry<Screen.BmiScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
                 BmiScreenMain(navigator)
-            }
-
-            entry<Screen.ConverterScreen>(metadata = ListDetailSceneStrategy.detailPane()) {
-                ConvertersScreenMain(navigator)
             }
 
             entry<Screen.EmiScreen>(metadata = ListDetailSceneStrategy.detailPane()) {

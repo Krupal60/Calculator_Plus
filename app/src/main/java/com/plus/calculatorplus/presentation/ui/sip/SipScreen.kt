@@ -367,8 +367,9 @@ fun SipScreen(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 24.dp),
-                shape = CircleShape,
+                    .padding(bottom = 16.dp)
+                    .height(56.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -431,7 +432,7 @@ fun SipScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp)
+                        .padding(bottom = 16.dp)
                 ) {
                     Column(
                         modifier = Modifier

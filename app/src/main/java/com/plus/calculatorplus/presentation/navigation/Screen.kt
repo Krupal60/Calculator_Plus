@@ -21,9 +21,6 @@ sealed interface Screen : NavKey {
     data object EmiScreen : Screen
 
     @Serializable
-    data object ConverterScreen : Screen
-
-    @Serializable
     data object DiscountScreen : Screen
 
     @Serializable

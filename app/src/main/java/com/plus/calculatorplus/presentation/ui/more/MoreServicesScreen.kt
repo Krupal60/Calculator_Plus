@@ -103,7 +103,6 @@ private val calculatorRoutes = setOf<NavKey>(
     Screen.SipScreen,
     Screen.BmiScreen,
     Screen.EmiScreen,
-    Screen.ConverterScreen,
     Screen.DiscountScreen,
     Screen.FdScreen,
     Screen.SwpScreen,

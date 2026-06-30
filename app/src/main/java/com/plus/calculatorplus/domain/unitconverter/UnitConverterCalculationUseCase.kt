@@ -1,6 +1,8 @@
 package com.plus.calculatorplus.domain.unitconverter
 
 import com.plus.calculatorplus.domain.toBigDecimalOrZero
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import org.koin.core.annotation.Singleton
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -47,7 +49,7 @@ class UnitConverterCalculationUseCase {
             )
         );
 
-        val units: List<String> get() = factors.keys.toList()
+        val units: ImmutableList<String> get() = factors.keys.toPersistentList()
     }
 
     data class UnitConverterInput(
